@@ -1,4 +1,4 @@
-import { Alert, AlertIcon, Button, Input } from "@chakra-ui/react";
+import { Alert, AlertIcon, Button, Input, VStack } from "@chakra-ui/react";
 import { useState } from "react";
 import useLogin from "../../hooks/useLogin";
 
@@ -8,41 +8,48 @@ const Login = () => {
     password: "",
   });
   const { loading, error, login } = useLogin();
+
   return (
-    <>
+    <VStack spacing={4}>
       <Input
-        placeholder="Email"
-        fontSize={14}
+        placeholder="E-posta"
+        fontSize={{ base: 12, md: 14 }}
         type="email"
-        size={"sm"}
+        size="sm"
         value={inputs.email}
         onChange={(e) => setInputs({ ...inputs, email: e.target.value })}
+        bg="gray.700"
+        color="white"
+        _placeholder={{ color: "gray.400" }}
       />
       <Input
-        placeholder="Password"
-        fontSize={14}
-        size={"sm"}
+        placeholder="Şifre"
+        fontSize={{ base: 12, md: 14 }}
         type="password"
+        size="sm"
         value={inputs.password}
         onChange={(e) => setInputs({ ...inputs, password: e.target.value })}
+        bg="gray.700"
+        color="white"
+        _placeholder={{ color: "gray.400" }}
       />
       {error && (
-        <Alert status="error" fontSize={13} p={2} borderRadius={4}>
+        <Alert status="error" fontSize={{ base: 12, md: 13 }} p={2} borderRadius="md">
           <AlertIcon fontSize={12} />
           {error.message}
         </Alert>
       )}
       <Button
-        w={"full"}
+        w="full"
         colorScheme="blue"
-        size={"sm"}
-        fontSize={14}
+        size="sm"
+        fontSize={{ base: 12, md: 14 }}
         isLoading={loading}
         onClick={() => login(inputs)}
       >
-        Log in
+        Giriş Yap
       </Button>
-    </>
+    </VStack>
   );
 };
 

@@ -1,5 +1,5 @@
 {
-  "name": "instagram",
+  "name": "lovixa",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+      "start": "react-scripts start",
+  "build": "react-scripts build"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",

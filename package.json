@@ -1,5 +1,5 @@
 {
-  "name": "instagram",
+  "name": "lovixa",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -7,9 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-      "start": "react-scripts start",
-  "build": "react-scripts build"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
@@ -23,7 +21,8 @@
     "react-firebase-hooks": "^5.1.1",
     "react-icons": "^5.0.1",
     "react-router-dom": "^6.22.0",
-    "zustand": "^4.5.1"
+    "zustand": "^4.5.1",
+    "mapbox-gl": "^2.15.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

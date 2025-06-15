@@ -1,25 +1,38 @@
-import { Box, Flex, Image, Text, VStack } from "@chakra-ui/react";
+import { Box, Flex, Image, Text, VStack, Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import GoogleAuth from "./GoogleAuth";
+import Login from "./Login";
+import Signup from "./Signup";
 
 const AuthForm = () => {
   return (
-    <Box maxW="400px" mx="auto" mt={10}>
-      <Box border="1px solid gray" borderRadius={4} padding={5} mb={4}>
+    <Box maxW="sm" w="full" mx="auto" mt={{ base: 4, md: 8 }} p={4}>
+      <Box border="1px solid" borderColor="gray.600" borderRadius="md" p={6} bg="gray.800">
         <VStack spacing={4}>
           <Image 
             src="/logo.png" 
-            h={24} 
+            h={{ base: 16, md: 20 }} 
             alt="Lovixa Logo"
             mx="auto"
           />
-          
-          <Text fontSize="lg" fontWeight="bold" mb={4}>
+          <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold" color="white" textAlign="center">
             Lovixa'ya Hoş Geldiniz
           </Text>
-          
-          <GoogleAuth prefix="Continue with" />
-          
-          <Text fontSize="sm" color="gray.400" mt={4} textAlign="center">
+          <Tabs isFitted variant="enclosed" w="full">
+            <TabList>
+              <Tab color="white" _selected={{ bg: "blue.500", color: "white" }}>Giriş</Tab>
+              <Tab color="white" _selected={{ bg: "blue.500", color: "white" }}>Kayıt</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel>
+                <Login />
+              </TabPanel>
+              <TabPanel>
+                <Signup />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+          <GoogleAuth prefix="Google ile devam et" />
+          <Text fontSize="xs" color="gray.400" textAlign="center" mt={4}>
             Google hesabınızla giriş yaparak hizmet şartlarımızı ve gizlilik politikamızı kabul etmiş olursunuz.
           </Text>
         </VStack>

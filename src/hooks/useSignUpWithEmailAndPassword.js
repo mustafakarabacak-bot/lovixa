@@ -1,71 +1,52 @@
-import { useCreateUserWithEmailAndPassword } from "react-firebase-hooks/auth";
+import { useState } from "react";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { auth, firestore } from "../firebase/firebase";
-import {
-  collection,
-  doc,
-  getDocs,
-  query,
-  setDoc,
-  where,
-} from "firebase/firestore";
-import useShowToast from "./useShowToast";
 import useAuthStore from "../store/authStore";
+import { useNavigate } from "react-router-dom";
 
 const useSignUpWithEmailAndPassword = () => {
-  const [createUserWithEmailAndPassword, , loading, error] =
-    useCreateUserWithEmailAndPassword(auth);
-  const showToast = useShowToast();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const loginUser = useAuthStore((state) => state.login);
+  const navigate = useNavigate();
 
   const signup = async (inputs) => {
-    if (
-      !inputs.email ||
-      !inputs.password ||
-      !inputs.username ||
-      !inputs.fullName
-    ) {
-      showToast("Error", "Please fill all the fields", "error");
-      return;
-    }
-
-    const usersRef = collection(firestore, "users");
-
-    const q = query(usersRef, where("username", "==", inputs.username));
-    const querySnapshot = await getDocs(q);
-
-    if (!querySnapshot.empty) {
-      showToast("Error", "Username already exists", "error");
-      return;
-    }
+    setLoading(true);
+    setError(null);
 
     try {
-      const newUser = await createUserWithEmailAndPassword(
-        inputs.email,
-        inputs.password
-      );
-      if (!newUser && error) {
-        showToast("Error", error.message, "error");
-        return;
+      if (!inputs.email || !inputs.password || !inputs.username || !inputs.fullName) {
+        throw new Error("Tüm alanlar zorunludur.");
       }
-      if (newUser) {
-        const userDoc = {
-          uid: newUser.user.uid,
-          email: inputs.email,
-          username: inputs.username,
-          fullName: inputs.fullName,
-          bio: "",
-          profilePicURL: "",
-          followers: [],
-          following: [],
-          posts: [],
-          createdAt: Date.now(),
-        };
-        await setDoc(doc(firestore, "users", newUser.user.uid), userDoc);
-        localStorage.setItem("user-info", JSON.stringify(userDoc));
-        loginUser(userDoc);
-      }
-    } catch (error) {
-      showToast("Error", error.message, "error");
+
+      const userCredential = await createUserWithEmailAndPassword(auth, inputs.email, inputs.password);
+      const user = userCredential.user;
+
+      await updateProfile(user, { displayName: inputs.fullName });
+
+      const userDoc = {
+        uid: user.uid,
+        email: user.email,
+        username: inputs.username.toLowerCase(),
+        fullName: inputs.fullName,
+        bio: "Merhaba, Lovixa'da yeniyim!",
+        profilePicURL: user.photoURL || "https://via.placeholder.com/150", // Varsayılan profil resmi
+        followers: [],
+        following: [],
+        posts: [],
+        createdAt: Date.now(),
+        location: { latitude: 0, longitude: 0 }, // Varsayılan konum (sonra güncellenecek)
+      };
+
+      await setDoc(doc(firestore, "users", user.uid), userDoc);
+      localStorage.setItem("user-info", JSON.stringify(userDoc));
+      loginUser(userDoc);
+      navigate("/home"); // Kayıt sonrası ana sayfaya yönlendirme
+    } catch (err) {
+      setError({ message: err.message });
+    } finally {
+      setLoading(false);
     }
   };
 

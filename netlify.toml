@@ -1,3 +1,0 @@
-git rm netlify.toml
-git commit -m "Remove broken flutter build command"
-git push

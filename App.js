@@ -9,7 +9,7 @@ import LoginScreen from "./screens/LoginScreen";
 import RegisterScreen from "./screens/RegisterScreen";
 import CompleteProfileScreen from "./screens/CompleteProfileScreen"; // <-- Eksik olan bu
 import DashboardScreen from "./screens/DashboardScreen";
-
+import HomePage from "./screens/HomePage.jsx";
 const Stack = createNativeStackNavigator();
 
 export default function App() {

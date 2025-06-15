@@ -1,33 +1,43 @@
-import { useSignInWithEmailAndPassword } from "react-firebase-hooks/auth";
-import useShowToast from "./useShowToast";
-import { auth, firestore } from "../firebase/firebase";
+import { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
+import { auth, firestore } from "../firebase/firebase";
 import useAuthStore from "../store/authStore";
+import { useNavigate } from "react-router-dom";
 
 const useLogin = () => {
-  const showToast = useShowToast();
-  const [signInWithEmailAndPassword, , loading, error] =
-    useSignInWithEmailAndPassword(auth);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const loginUser = useAuthStore((state) => state.login);
+  const navigate = useNavigate();
 
   const login = async (inputs) => {
-    if (!inputs.email || !inputs.password) {
-      return showToast("Error", "Please fill all the fields", "error");
-    }
-    try {
-      const userCred = await signInWithEmailAndPassword(
-        inputs.email,
-        inputs.password
-      );
+    setLoading(true);
+    setError(null);
 
-      if (userCred) {
-        const docRef = doc(firestore, "users", userCred.user.uid);
-        const docSnap = await getDoc(docRef);
-        localStorage.setItem("user-info", JSON.stringify(docSnap.data()));
-        loginUser(docSnap.data());
+    try {
+      if (!inputs.email || !inputs.password) {
+        throw new Error("E-posta ve şifre alanları zorunludur.");
       }
-    } catch (error) {
-      showToast("Error", error.message, "error");
+
+      const userCredential = await signInWithEmailAndPassword(auth, inputs.email, inputs.password);
+      const user = userCredential.user;
+
+      const userRef = doc(firestore, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (!userSnap.exists()) {
+        throw new Error("Kullanıcı bulunamadı.");
+      }
+
+      const userDoc = userSnap.data();
+      localStorage.setItem("user-info", JSON.stringify(userDoc));
+      loginUser(userDoc);
+      navigate("/home"); // Giriş sonrası ana sayfaya yönlendirme
+    } catch (err) {
+      setError({ message: err.message });
+    } finally {
+      setLoading(false);
     }
   };
 

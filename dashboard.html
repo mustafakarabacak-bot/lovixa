@@ -11,16 +11,14 @@
       --surface: #1e1e1e;
       --primary: #4caf50;
       --text: #ffffff;
-    }* {
-  box-sizing: border-box;
-}
+    }* { box-sizing: border-box; }
 
 body {
   margin: 0;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Segoe UI', Arial, sans-serif;
+  font-family: "Segoe UI", Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
@@ -54,10 +52,7 @@ body {
 }
 
 /* Map */
-#map {
-  flex: 1;
-  width: 100%;
-}
+#map { flex: 1; width: 100%; }
 
 /* Bottom Navigation */
 .bottom-nav {
@@ -92,11 +87,7 @@ body {
 }
 
 /* Popup */
-.popup {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
+.popup { display: flex; flex-direction: column; gap: 4px; }
 
 .popup button {
   border: none;
@@ -122,81 +113,82 @@ body {
     <a href="dashboard.html" class="nav-btn material-icons" title="Anasayfa">home</a>
     <a href="messages.html" class="nav-btn material-icons" title="Mesajlar">chat</a>
     <a href="profile.html" class="nav-btn material-icons" title="Profil">person</a>
-  </nav>  <!-- Firebase & Google Maps -->  <script type="module">
+  </nav>  <!-- Firebase, Firestore & Google Maps Logic -->  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-    // Firebase Config (DOLDURULMUŞ)
+    // Firebase Config (Map API key gömülü)
     const firebaseConfig = {
-      apiKey: "AIzaSyBzUyATE4CUGvtIeZ5pf0hLreaFF4p3rSM",
+      apiKey: "AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E",
       authDomain: "silicon-park-462509-r3.firebaseapp.com",
       projectId: "silicon-park-462509-r3",
       storageBucket: "silicon-park-462509-r3.appspot.com",
       messagingSenderId: "463275849598",
       appId: "1:463275849598:web:19ffa6e6e5e1ff5077252f",
-      measurementId: "G-8CTH7CQ2SS",
+      measurementId: "G-8CTH7CQ2SS"
     };
 
-    initializeApp(firebaseConfig);
-    getAuth(); // auth objesi ileride kullanılabilir (ör. çıkış vs.)
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-    // Google Maps init callback global olması gerekiyor
-    window.initMap = () => {
-      const mapDiv = document.getElementById("map");
+    let map;
+    let myMarker;
+    let visible = true;
+    const otherMarkers = new Map(); // uid -> marker
+
+    // ——— AUTH DURUMU ———
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+      } else {
+        initMapAndLocation(user);
+      }
+    });
+
+    // ——— MAP + GEO + FIRESTORE ———
+    function initMapAndLocation(user) {
       navigator.geolocation.getCurrentPosition(
         (pos) => {
           const myPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-          const map = new google.maps.Map(mapDiv, {
-            center: myPos,
-            zoom: 14,
-            mapId: "a772948b1f9c04b5", // opsiyonel karanlık stil id'niz varsa
-          });
-
-          // ——— KULLANICININ KONUM MARKER'I ———
-          const myMarker = new google.maps.marker.AdvancedMarkerElement({
+          createMap(myPos);
+          myMarker = new google.maps.marker.AdvancedMarkerElement({
             map,
             position: myPos,
-            content: createAvatarMarker("https://i.pravatar.cc/100?u=myself"),
+            content: createAvatarMarker(`https://i.pravatar.cc/100?u=${user.uid}`)
           });
-
-          // Konum göster/gizle
-          let visible = true;
-          document.getElementById("location-toggle").addEventListener("click", () => {
-            visible = !visible;
-            myMarker.map = visible ? map : null;
-          });
-
-          // ——— DİĞER AKTİF KULLANICILAR ———
-          const others = [
-            { id: 1, lat: myPos.lat + 0.01, lng: myPos.lng + 0.01, img: "https://i.pravatar.cc/100?u=1" },
-            { id: 2, lat: myPos.lat - 0.008, lng: myPos.lng - 0.012, img: "https://i.pravatar.cc/100?u=2" },
-            { id: 3, lat: myPos.lat + 0.015, lng: myPos.lng - 0.005, img: "https://i.pravatar.cc/100?u=3" },
-            { id: 4, lat: myPos.lat - 0.02, lng: myPos.lng + 0.009, img: "https://i.pravatar.cc/100?u=4" },
-          ];
-
-          const info = new google.maps.InfoWindow();
-
-          others.forEach((u) => {
-            const marker = new google.maps.marker.AdvancedMarkerElement({
-              map,
-              position: { lat: u.lat, lng: u.lng },
-              content: createAvatarMarker(u.img),
+          writeLocation(user.uid, myPos);
+          // 5 saniyede bir güncelle
+          setInterval(() => {
+            navigator.geolocation.getCurrentPosition((p) => {
+              const newPos = { lat: p.coords.latitude, lng: p.coords.longitude };
+              if (myMarker) myMarker.position = newPos;
+              writeLocation(user.uid, newPos);
             });
-
-            marker.addListener("gmp-click", () => {
-              info.setContent(popupHTML(u.id));
-              info.open(map, marker);
-            });
-          });
+          }, 5000);
+          listenOthers(user.uid);
         },
-        (err) => {
-          alert("Konum alınamadı: " + err.message);
-        },
+        (err) => alert("Konum alınamadı: " + err.message),
         { enableHighAccuracy: true }
       );
-    };
+    }
 
-    // Yardımcı: Avatar div'i oluştur
+    function createMap(center) {
+      map = new google.maps.Map(document.getElementById("map"), {
+        center,
+        zoom: 14,
+        mapId: "a772948b1f9c04b5" // opsiyonel koyu tema ID
+      });
+
+      // Konum göster / gizle
+      document.getElementById("location-toggle").addEventListener("click", () => {
+        visible = !visible;
+        myMarker.map = visible ? map : null;
+      });
+    }
+
+    // Avatar marker HTML oluşturur
     function createAvatarMarker(url) {
       const d = document.createElement("div");
       d.className = "avatar-marker";
@@ -204,13 +196,59 @@ body {
       return d;
     }
 
-    // Yardımcı: Popup içeriği
+    // Firestore'a konum yaz/merge et
+    function writeLocation(uid, coords) {
+      const ref = doc(db, "activeUsers", uid);
+      setDoc(ref, { lat: coords.lat, lng: coords.lng, ts: Date.now() }, { merge: true });
+    }
+
+    // Diğer kullanıcıları dinle & haritaya yerleştir
+    function listenOthers(myUid) {
+      const col = collection(db, "activeUsers");
+      onSnapshot(col, (snap) => {
+        snap.docChanges().forEach((change) => {
+          const uid = change.doc.id;
+          if (uid === myUid) return;
+          const data = change.doc.data();
+
+          if (change.type === "removed") {
+            if (otherMarkers.has(uid)) {
+              otherMarkers.get(uid).map = null;
+              otherMarkers.delete(uid);
+            }
+          } else {
+            let marker = otherMarkers.get(uid);
+            if (!marker) {
+              marker = new google.maps.marker.AdvancedMarkerElement({
+                map,
+                position: { lat: data.lat, lng: data.lng },
+                content: createAvatarMarker(`https://i.pravatar.cc/100?u=${uid}`)
+              });
+              marker.addListener("gmp-click", () => {
+                const info = new google.maps.InfoWindow({
+                  content: popupHTML(uid)
+                });
+                info.open(map, marker);
+              });
+              otherMarkers.set(uid, marker);
+            } else {
+              marker.position = { lat: data.lat, lng: data.lng };
+            }
+          }
+        });
+      });
+    }
+
+    // InfoWindow içeriği
     function popupHTML(uid) {
       return `
         <div class="popup">
-          <button class="msg-btn" onclick="alert('Mesaj Göster - UID: ${uid}')">Mesaj Göster</button>
+          <button class="msg-btn" onclick="window.location.href='messages.html?uid=${uid}'">Mesaj Göster</button>
           <button class="profile-btn" onclick="window.location.href='profile.html?uid=${uid}'">Profile Git</button>
         </div>`;
     }
-  </script>  <!-- Google Maps (marker kitaplığıyla) -->  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap&libraries=marker" async defer></script></body>
+  </script>  <!-- Google Maps -->  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&libraries=marker" async defer></script>  <script>
+    // Harita callback'i API parametresinde tanımlı olmadığı için placeholder
+    function initMap() { /* Auth sonrası JS'te oluşturuluyor */ }
+  </script></body>
 </html>

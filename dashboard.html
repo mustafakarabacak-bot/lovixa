@@ -1,0 +1,216 @@
+<!DOCTYPE html><html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LOVIXA DASHBOARD</title>
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #1e1e1e;
+      --primary: #4caf50;
+      --text: #ffffff;
+    }* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* Top Bar */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: var(--surface);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+}
+
+.topbar h1 {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 1px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+
+/* Map */
+#map {
+  flex: 1;
+  width: 100%;
+}
+
+/* Bottom Navigation */
+.bottom-nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  height: 56px;
+  background: var(--surface);
+  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.nav-btn {
+  color: var(--text);
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  text-decoration: none;
+}
+
+/* Avatar Marker */
+.avatar-marker {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  border: 3px solid var(--primary);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Popup */
+.popup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.popup button {
+  border: none;
+  border-radius: 8px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #fff;
+}
+
+.popup .msg-btn { background: var(--primary); }
+.popup .profile-btn { background: #4285f4; }
+
+  </style>
+</head>
+<body>
+  <!-- Top Bar -->
+  <header class="topbar">
+    <button id="location-toggle" class="icon-btn material-icons" title="Konum Göster/Gizle">place</button>
+    <h1>LOVIXA</h1>
+    <a href="notifications.html" class="icon-btn material-icons" title="Bildirimler">favorite</a>
+  </header>  <!-- Map -->  <main id="map"></main>  <!-- Bottom Navigation -->  <nav class="bottom-nav">
+    <a href="dashboard.html" class="nav-btn material-icons" title="Anasayfa">home</a>
+    <a href="messages.html" class="nav-btn material-icons" title="Mesajlar">chat</a>
+    <a href="profile.html" class="nav-btn material-icons" title="Profil">person</a>
+  </nav>  <!-- Firebase & Google Maps -->  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+
+    // Firebase Config (DOLDURULMUŞ)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBzUyATE4CUGvtIeZ5pf0hLreaFF4p3rSM",
+      authDomain: "silicon-park-462509-r3.firebaseapp.com",
+      projectId: "silicon-park-462509-r3",
+      storageBucket: "silicon-park-462509-r3.appspot.com",
+      messagingSenderId: "463275849598",
+      appId: "1:463275849598:web:19ffa6e6e5e1ff5077252f",
+      measurementId: "G-8CTH7CQ2SS",
+    };
+
+    initializeApp(firebaseConfig);
+    getAuth(); // auth objesi ileride kullanılabilir (ör. çıkış vs.)
+
+    // Google Maps init callback global olması gerekiyor
+    window.initMap = () => {
+      const mapDiv = document.getElementById("map");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const myPos = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          const map = new google.maps.Map(mapDiv, {
+            center: myPos,
+            zoom: 14,
+            mapId: "a772948b1f9c04b5", // opsiyonel karanlık stil id'niz varsa
+          });
+
+          // ——— KULLANICININ KONUM MARKER'I ———
+          const myMarker = new google.maps.marker.AdvancedMarkerElement({
+            map,
+            position: myPos,
+            content: createAvatarMarker("https://i.pravatar.cc/100?u=myself"),
+          });
+
+          // Konum göster/gizle
+          let visible = true;
+          document.getElementById("location-toggle").addEventListener("click", () => {
+            visible = !visible;
+            myMarker.map = visible ? map : null;
+          });
+
+          // ——— DİĞER AKTİF KULLANICILAR ———
+          const others = [
+            { id: 1, lat: myPos.lat + 0.01, lng: myPos.lng + 0.01, img: "https://i.pravatar.cc/100?u=1" },
+            { id: 2, lat: myPos.lat - 0.008, lng: myPos.lng - 0.012, img: "https://i.pravatar.cc/100?u=2" },
+            { id: 3, lat: myPos.lat + 0.015, lng: myPos.lng - 0.005, img: "https://i.pravatar.cc/100?u=3" },
+            { id: 4, lat: myPos.lat - 0.02, lng: myPos.lng + 0.009, img: "https://i.pravatar.cc/100?u=4" },
+          ];
+
+          const info = new google.maps.InfoWindow();
+
+          others.forEach((u) => {
+            const marker = new google.maps.marker.AdvancedMarkerElement({
+              map,
+              position: { lat: u.lat, lng: u.lng },
+              content: createAvatarMarker(u.img),
+            });
+
+            marker.addListener("gmp-click", () => {
+              info.setContent(popupHTML(u.id));
+              info.open(map, marker);
+            });
+          });
+        },
+        (err) => {
+          alert("Konum alınamadı: " + err.message);
+        },
+        { enableHighAccuracy: true }
+      );
+    };
+
+    // Yardımcı: Avatar div'i oluştur
+    function createAvatarMarker(url) {
+      const d = document.createElement("div");
+      d.className = "avatar-marker";
+      d.style.backgroundImage = `url(${url})`;
+      return d;
+    }
+
+    // Yardımcı: Popup içeriği
+    function popupHTML(uid) {
+      return `
+        <div class="popup">
+          <button class="msg-btn" onclick="alert('Mesaj Göster - UID: ${uid}')">Mesaj Göster</button>
+          <button class="profile-btn" onclick="window.location.href='profile.html?uid=${uid}'">Profile Git</button>
+        </div>`;
+    }
+  </script>  <!-- Google Maps (marker kitaplığıyla) -->  <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap&libraries=marker" async defer></script></body>
+</html>

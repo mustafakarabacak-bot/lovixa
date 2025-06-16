@@ -8,7 +8,7 @@
         body, html { margin: 0; padding: 0; height: 100%; font-family: Arial, sans-serif; }
         #map { height: calc(100% - 50px); width: 100%; }
         #bottom-nav { position: fixed; bottom: 0; width: 100%; background: #333; display: flex; justify-content: space-around; padding: 10px 0; }
-        #bottom-nav button { background: #555; color: white; border: none; padding: 10px; cursor: pointer; flex: 1; margin: 0 5px; }
+        #bottom-nav button { background: #555; color: white; border: none; padding: 10px; cursor: pointer; flex: 1; margin: 0 5px; border-radius: 5px; }
         #bottom-nav button.active { background: #007bff; }
         #username-popup { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center; z-index: 1000; }
         #username-form { background: white; padding: 20px; border-radius: 5px; text-align: center; width: 90%; max-width: 400px; }
@@ -32,10 +32,11 @@
         .header img { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; }
         .no-messages { text-align: center; color: #777; padding: 20px; }
         .timestamp { font-size: 0.7em; color: #888; display: block; margin-top: 5px; }
+        .error-message { color: #dc3545; text-align: center; margin-top: 10px; }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&libraries=places"></script>
 </head>
 <body>
@@ -48,6 +49,7 @@
                 <img class="google-icon" src="https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg">
                 Google ile Oturum Aç
             </button>
+            <div id="login-error" class="error-message"></div>
         </div>
     </div>
 
@@ -57,6 +59,7 @@
             <h3>Lütfen Kullanıcı Adı Giriniz</h3>
             <input type="text" id="username-input" placeholder="Kullanıcı Adı" style="width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ddd; border-radius: 5px;">
             <button onclick="saveUsername()" style="padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Kaydet</button>
+            <div id="username-error" class="error-message"></div>
         </div>
     </div>
 
@@ -82,7 +85,7 @@
         </div>
         <div id="chat-messages"></div>
         <div class="chat-input-container">
-            <input type="text" id="chat-input" placeholder="Mesaj yaz...">
+            <input type="text" id="chat-input" placeholder="Mesaj yaz..." autocomplete="off">
             <button class="send-button" onclick="sendMessage()">Gönder</button>
         </div>
     </div>
@@ -98,6 +101,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBzUyATE4CUGvtIeZ5pf0hLreaFF4p3rSM",
             authDomain: "silicon-park-462509-r3.firebaseapp.com",
+            databaseURL: "https://silicon-park-462509-r3-default-rtdb.firebaseio.com",
             projectId: "silicon-park-462509-r3",
             storageBucket: "silicon-park-462509-r3.appspot.com",
             messagingSenderId: "463275849598",
@@ -105,8 +109,8 @@
             measurementId: "G-8CTH7CQ2SS"
         };
 
-        // Firebase Başlatma
-        const app = firebase.initializeApp(firebaseConfig);
+        // Firebase Başlatma (compat sürümü)
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
 
@@ -117,10 +121,28 @@
         // Google ile Oturum Açma
         document.getElementById('login-button').addEventListener('click', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
-            auth.signInWithPopup(provider).catch(error => {
-                console.error('Oturum açma hatası:', error);
-                alert('Oturum açma hatası: ' + error.message);
-            });
+            provider.addScope('profile');
+            provider.addScope('email');
+            
+            auth.signInWithPopup(provider)
+                .then((result) => {
+                    // Giriş başarılı
+                    document.getElementById('login-error').textContent = '';
+                })
+                .catch((error) => {
+                    console.error('Google giriş hatası:', error);
+                    let errorMessage = 'Google ile giriş yapılamadı.';
+                    
+                    if (error.code === 'auth/popup-blocked') {
+                        errorMessage = 'Popup engellendi. Lütfen tarayıcı ayarlarınızı kontrol edin veya farklı bir giriş yöntemi deneyin.';
+                    } else if (error.code === 'auth/network-request-failed') {
+                        errorMessage = 'Ağ hatası. Lütfen internet bağlantınızı kontrol edin.';
+                    } else if (error.code === 'auth/unauthorized-domain') {
+                        errorMessage = 'Yetkisiz domain. Uygulama bu domainde çalışamaz.';
+                    }
+                    
+                    document.getElementById('login-error').textContent = errorMessage;
+                });
         });
 
         // Kullanıcı Durumu Kontrolü
@@ -145,42 +167,52 @@
                 if (!snapshot.exists() || !snapshot.val().username) {
                     document.getElementById('username-popup').style.display = 'flex';
                 } else {
-                    currentUsername = snapshot.val().username;
+                    const userData = snapshot.val();
+                    currentUsername = userData.username;
                     updateUserLocation(user);
                 }
             }).catch(error => {
                 console.error('Kullanıcı adı kontrol hatası:', error);
+                document.getElementById('username-error').textContent = 'Kullanıcı bilgileri alınamadı. Lütfen sayfayı yenileyin.';
             });
         }
 
         // Kullanıcı Adı Kaydetme
         function saveUsername() {
             const username = document.getElementById('username-input').value.trim();
-            if (username) {
-                db.ref('users/' + currentUserId).set({
-                    username: username,
-                    photoURL: auth.currentUser.photoURL,
-                    location: { lat: 0, lng: 0 }
-                }).then(() => {
-                    currentUsername = username;
-                    document.getElementById('username-popup').style.display = 'none';
-                    updateUserLocation(auth.currentUser);
-                }).catch(error => {
-                    console.error('Kullanıcı adı kaydetme hatası:', error);
-                    alert('Kullanıcı adı kaydedilemedi: ' + error.message);
-                });
-            } else {
-                alert('Lütfen geçerli bir kullanıcı adı giriniz');
+            if (username.length < 3) {
+                document.getElementById('username-error').textContent = 'Kullanıcı adı en az 3 karakter olmalıdır.';
+                return;
             }
+            
+            db.ref('users/' + currentUserId).set({
+                username: username,
+                photoURL: auth.currentUser.photoURL,
+                location: { lat: 0, lng: 0 }
+            }).then(() => {
+                currentUsername = username;
+                document.getElementById('username-popup').style.display = 'none';
+                document.getElementById('username-error').textContent = '';
+                updateUserLocation(auth.currentUser);
+            }).catch(error => {
+                console.error('Kullanıcı adı kaydetme hatası:', error);
+                document.getElementById('username-error').textContent = 'Kullanıcı adı kaydedilemedi. Lütfen tekrar deneyin.';
+            });
         }
 
         // Harita Başlatma
         function initMap(user) {
+            if (!navigator.geolocation) {
+                alert('Tarayıcınız konum bilgisini desteklemiyor.');
+                return;
+            }
+            
             navigator.geolocation.getCurrentPosition(position => {
                 const userLocation = {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
+                
                 map = new google.maps.Map(document.getElementById('map'), {
                     center: userLocation,
                     zoom: 15,
@@ -254,11 +286,15 @@
                     }
                     
                     // Haritayı kullanıcının konumuna kaydır
-                    map.panTo(newLocation);
+                    if (map) {
+                        map.panTo(newLocation);
+                    }
                     
                     // Firebase'de konumu güncelle
                     db.ref('users/' + user.uid).update({
                         location: newLocation
+                    }).catch(error => {
+                        console.error('Konum güncelleme hatası:', error);
                     });
                 },
                 error => {
@@ -275,6 +311,8 @@
         // Diğer Kullanıcıları Haritaya Ekleme
         function loadOtherUsers() {
             db.ref('users').on('value', snapshot => {
+                if (!snapshot.exists()) return;
+                
                 snapshot.forEach(child => {
                     const userData = child.val();
                     const userId = child.key;
@@ -299,7 +337,7 @@
                         position: userLocation,
                         map: map,
                         icon: {
-                            path: google.maps.SymbolPath.CIRCEL,
+                            path: google.maps.SymbolPath.CIRCLE,
                             scale: 8,
                             fillColor: "#EA4335",
                             fillOpacity: 1,
@@ -316,7 +354,7 @@
                         currentChatPhoto = userData.photoURL;
                         
                         document.getElementById('chat-with').textContent = userData.username;
-                        document.getElementById('chat-user-photo').src = userData.photoURL;
+                        document.getElementById('chat-user-photo').src = userData.photoURL || 'https://via.placeholder.com/40';
                         showSection('chat');
                         loadChatMessages();
                     });
@@ -454,15 +492,15 @@
                 document.getElementById('chat-input').value = '';
                 
                 // Son mesaj bilgisini her iki kullanıcı için de güncelle
-                db.ref('messages/' + currentUserId + '/' + currentChatUserId).set({
+                const lastMessageData = {
                     lastMessage: text,
-                    timestamp: timestamp
-                });
+                    timestamp: timestamp,
+                    senderName: currentUsername,
+                    senderPhoto: currentUserPhoto
+                };
                 
-                db.ref('messages/' + currentChatUserId + '/' + currentUserId).set({
-                    lastMessage: text,
-                    timestamp: timestamp
-                });
+                db.ref('messages/' + currentUserId + '/' + currentChatUserId).set(lastMessageData);
+                db.ref('messages/' + currentChatUserId + '/' + currentUserId).set(lastMessageData);
             }).catch(error => {
                 console.error('Mesaj gönderme hatası:', error);
                 alert('Mesaj gönderilemedi: ' + error.message);

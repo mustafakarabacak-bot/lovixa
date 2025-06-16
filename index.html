@@ -73,7 +73,7 @@
     </div>
 
     <div id="chat-section">
-        <button class="back-button" onclick="showSection('messages')">&lt; Geri</button>
+        <button class="back-button" onclick="showSection('messages')">< Geri</button>
         <div class="header">
             <img id="chat-user-photo" src="">
             <h3>Sohbet: <span id="chat-with"></span></h3>
@@ -108,7 +108,7 @@
 
         let map, userMarker, markers = {};
         let currentUserId, currentUsername, currentUserPhoto, currentChatUserId, currentChatUsername, currentChatPhoto;
-        let locationWatchId;
+        let locationWatchId, lastUpdatedInterval;
 
         document.getElementById('login-button').addEventListener('click', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
@@ -147,6 +147,10 @@
                 if (locationWatchId) {
                     navigator.geolocation.clearWatch(locationWatchId);
                 }
+                if (lastUpdatedInterval) {
+                    clearInterval(lastUpdatedInterval);
+                    lastUpdatedInterval = null;
+                }
             }
         });
 
@@ -175,7 +179,8 @@
             db.ref('users/' + currentUserId).set({
                 username: username,
                 photoURL: auth.currentUser.photoURL,
-                location: { lat: 0, lng: 0 }
+                location: { lat: 0, lng: 0 },
+                lastUpdated: Date.now()
             }).then(() => {
                 currentUsername = username;
                 document.getElementById('username-popup').style.display = 'none';
@@ -185,6 +190,25 @@
                 console.error('Kullanıcı adı kaydetme hatası:', error);
                 document.getElementById('username-error').textContent = 'Kullanıcı adı kaydedilemedi. Lütfen tekrar deneyin.';
             });
+        }
+
+        function updateUserLocation(user) {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    db.ref('users/' + user.uid).update({
+                        location: userLocation,
+                        lastUpdated: Date.now()
+                    }).catch(error => {
+                        console.error('Konum güncelleme hatası:', error);
+                    });
+                }, error => {
+                    console.error('Konum alınamadı:', error);
+                });
+            }
         }
 
         function initMap(user) {
@@ -237,6 +261,14 @@
 
                 startLocationTracking(user);
                 loadOtherUsers();
+                
+                lastUpdatedInterval = setInterval(() => {
+                    db.ref('users/' + user.uid).update({
+                        lastUpdated: Date.now()
+                    }).catch(error => {
+                        console.error('Last updated refresh hatası:', error);
+                    });
+                }, 30000);
             }, (error) => {
                 console.error('Konum hatası:', error);
                 alert('Konum alınamadı, varsayılan konum kullanılıyor.');
@@ -284,7 +316,8 @@
                     }
                     
                     db.ref('users/' + user.uid).update({
-                        location: newLocation
+                        location: newLocation,
+                        lastUpdated: Date.now()
                     }).catch(error => {
                         console.error('Konum güncelleme hatası:', error);
                     });
@@ -303,49 +336,46 @@
         function loadOtherUsers() {
             db.ref('users').on('value', snapshot => {
                 if (!snapshot.exists()) return;
-                
+                const now = Date.now();
                 snapshot.forEach(child => {
                     const userData = child.val();
                     const userId = child.key;
-                    
                     if (userId === currentUserId || !userData.location) return;
-                    
-                    const userLocation = new google.maps.LatLng(
-                        userData.location.lat,
-                        userData.location.lng
-                    );
-                    
-                    if (markers[userId]) {
-                        markers[userId].setPosition(userLocation);
+                    if (now - userData.lastUpdated > 30000) {
+                        if (markers[userId]) {
+                            markers[userId].setMap(null);
+                            delete markers[userId];
+                        }
                         return;
                     }
-                    
-                    const marker = new google.maps.Marker({
-                        position: userLocation,
-                        map: map,
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            scale: 8,
-                            fillColor: "#EA4335",
-                            fillOpacity: 1,
-                            strokeColor: "#FFFFFF",
-                            strokeWeight: 2
-                        },
-                        title: userData.username
-                    });
-                    
-                    marker.addListener('click', () => {
-                        currentChatUserId = userId;
-                        currentChatUsername = userData.username;
-                        currentChatPhoto = userData.photoURL;
-                        
-                        document.getElementById('chat-with').textContent = userData.username;
-                        document.getElementById('chat-user-photo').src = userData.photoURL || 'https://via.placeholder.com/40';
-                        showSection('chat');
-                        loadChatMessages();
-                    });
-                    
-                    markers[userId] = marker;
+                    const userLocation = new google.maps.LatLng(userData.location.lat, userData.location.lng);
+                    if (markers[userId]) {
+                        markers[userId].setPosition(userLocation);
+                    } else {
+                        const marker = new google.maps.Marker({
+                            position: userLocation,
+                            map: map,
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                scale: 8,
+                                fillColor: "#EA4335",
+                                fillOpacity: 1,
+                                strokeColor: "#FFFFFF",
+                                strokeWeight: 2
+                            },
+                            title: userData.username
+                        });
+                        marker.addListener('click', () => {
+                            currentChatUserId = userId;
+                            currentChatUsername = userData.username;
+                            currentChatPhoto = userData.photoURL;
+                            document.getElementById('chat-with').textContent = userData.username;
+                            document.getElementById('chat-user-photo').src = userData.photoURL || 'https://via.placeholder.com/40';
+                            showSection('chat');
+                            loadChatMessages();
+                        });
+                        markers[userId] = marker;
+                    }
                 });
             }, error => {
                 console.error('Kullanıcı yükleme hatası:', error);
@@ -371,9 +401,10 @@
 
         function loadMessages() {
             const messagesList = document.getElementById('messages-list');
-            messagesList.innerHTML = '';
+            messagesList.innerHTML = '<div class="loading">Yükleniyor...</div>';
             
             db.ref('messages/' + currentUserId).once('value').then(snapshot => {
+                messagesList.innerHTML = '';
                 if (!snapshot.exists() || snapshot.numChildren() === 0) {
                     messagesList.innerHTML = '<div class="no-messages">Henüz mesajınız yok</div>';
                     return;
@@ -422,7 +453,7 @@
 
         function loadChatMessages() {
             const chatMessages = document.getElementById('chat-messages');
-            chatMessages.innerHTML = '';
+            chatMessages.innerHTML = '<div class="loading">Yükleniyor...</div>';
             
             if (!currentChatUserId) return;
             
@@ -430,7 +461,6 @@
             
             db.ref('chats/' + chatId).orderByChild('timestamp').on('value', snapshot => {
                 chatMessages.innerHTML = '';
-                
                 if (!snapshot.exists()) {
                     chatMessages.innerHTML = '<div class="no-messages">Henüz mesaj yok. İlk mesajı sen gönder!</div>';
                     return;

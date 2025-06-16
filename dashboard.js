@@ -404,7 +404,7 @@
     // 10 saniye içinde oturum açılmazsa giriş sayfasına yönlendir
     setTimeout(() => {
       if (!auth.currentUser) {
-        window.location.href = "dashboard.html";
+        window.location.href = "login.html";
       }
     }, 10000);
   </script>

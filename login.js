@@ -1,58 +1,43 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+// login.js
+import { auth }                             from "./firebase.js";
 import {
-  getAuth,
-  setPersistence,
-  browserLocalPersistence,
   signInWithEmailAndPassword,
   GoogleAuthProvider,
   signInWithPopup
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E",
-  authDomain: "silicon-park-462509-r3.firebaseapp.com",
-  projectId: "silicon-park-462509-r3",
-  storageBucket: "silicon-park-462509-r3.appspot.com",
-  messagingSenderId: "463275849598",
-  appId: "1:463275849598:web:19ffa6e6e5e1ff5077252f"
-};
+// --- DOM bağlama ----------------------------------------------------------
+const emailEl   = document.getElementById("email");
+const passEl    = document.getElementById("password");
+const loginBtn  = document.getElementById("login-btn");
+const googleBtn = document.getElementById("google-btn");
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
+// --- Email / Şifre --------------------------------------------------------
+loginBtn.addEventListener("click", async () => {
+  const email = emailEl.value.trim();
+  const pass  = passEl.value;
 
-setPersistence(auth, browserLocalPersistence)
-  .then(() => {
-    console.log("Persistence set successfully");
-  })
-  .catch((error) => {
-    console.error("Error setting persistence:", error);
-  });
-
-document.getElementById("login-btn").addEventListener("click", async () => {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  if (!email || !password) {
-    alert("Lütfen e-posta ve şifre girin.");
+  if (!email || !pass) {
+    alert("Lütfen e-posta ve şifre giriniz.");
     return;
   }
-
   try {
-    await signInWithEmailAndPassword(auth, email, password);
-    window.location.href = "dashboard.html";
+    await signInWithEmailAndPassword(auth, email, pass);
+    location.href = "dashboard.html";
   } catch (err) {
-    alert("E-posta/Şifre hatası: " + err.message);
-    console.error("[Email Sign-In]", err);
+    alert("Giriş başarısız: " + err.code);
+    console.error("[LOGIN]", err);
   }
 });
 
-document.getElementById("google-btn").addEventListener("click", async () => {
+// --- Google OAuth --------------------------------------------------------
+googleBtn.addEventListener("click", async () => {
   try {
     const provider = new GoogleAuthProvider();
     await signInWithPopup(auth, provider);
-    window.location.href = "dashboard.html";
+    location.href = "dashboard.html";
   } catch (err) {
-    alert("Google giriş hatası: " + err.message);
-    console.error("[Google Sign-In]", err);
+    alert("Google giriş hatası: " + err.code);
+    console.error("[GOOGLE LOGIN]", err);
   }
 });

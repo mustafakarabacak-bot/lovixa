@@ -3,8 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Lovixa - Kayıt Ol</title>
-  <script type="module" src="./register.js"></script>
+  <title>Lovixa - Giriş</title>
+
+  <!-- JS bağlantısı -->
+  <script type="module" src="./login.js"></script>
+
+  <!-- Stil -->
   <style>
     :root {
       --bg-color: #0d0d0d;
@@ -78,19 +82,24 @@
       background-color: var(--primary-hover);
     }
 
-    .login-link {
+    .google-btn {
+      background-color: var(--accent);
+      margin-top: 0.5rem;
+    }
+
+    .register-link {
       margin-top: 1.5rem;
       text-align: center;
       font-size: 0.95rem;
     }
 
-    .login-link a {
+    .register-link a {
       color: var(--primary);
       text-decoration: none;
       font-weight: 500;
     }
 
-    .login-link a:hover {
+    .register-link a:hover {
       text-decoration: underline;
     }
 
@@ -113,12 +122,13 @@
 </head>
 <body>
   <div class="container">
-    <h2>Kayıt Ol</h2>
+    <h2>Giriş Yap</h2>
     <input type="email" id="email" placeholder="E-posta adresin" />
     <input type="password" id="password" placeholder="Şifren" />
-    <button id="register-btn">Kayıt Ol</button>
-    <div class="login-link">
-      <p>Zaten hesabın var mı? <a href="login.html">Giriş Yap</a></p>
+    <button id="login-btn">Giriş Yap</button>
+    <button id="google-btn" class="google-btn">Google ile Giriş</button>
+    <div class="register-link">
+      <p>Hesabın yok mu? <a href="register.html">Kayıt Ol</a></p>
     </div>
   </div>
 </body>

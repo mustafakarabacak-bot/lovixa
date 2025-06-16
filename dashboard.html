@@ -3,7 +3,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>LOVIXA DASHBOARD</title>
-  <!-- Material Icons -->
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style>
     :root {
@@ -11,115 +10,96 @@
       --surface: #1e1e1e;
       --primary: #4caf50;
       --text: #ffffff;
-    }* { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-}
-
-/* Top Bar */
-.topbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
-  background: var(--surface);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
-}
-
-.topbar h1 {
-  margin: 0;
-  font-size: 1.4rem;
-  letter-spacing: 1px;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  color: var(--text);
-  font-size: 28px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-}
-
-/* Map */
-#map { flex: 1; width: 100%; display: none; }
-
-/* Bottom Navigation */
-.bottom-nav {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 56px;
-  background: var(--surface);
-  box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.4);
-}
-
-.nav-btn {
-  color: var(--text);
-  font-size: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  text-decoration: none;
-}
-
-.avatar-marker {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  border: 3px solid var(--primary);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
-}
-
-.popup { display: flex; flex-direction: column; gap: 4px; }
-
-.popup button {
-  border: none;
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  color: #fff;
-}
-
-.popup .msg-btn { background: var(--primary); }
-.popup .profile-btn { background: #4285f4; }
-
-.loader {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.loader:after {
-  content: "";
-  width: 40px;
-  height: 40px;
-  border: 5px solid rgba(255,255,255,0.2);
-  border-top-color: var(--primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 12px;
+      background: var(--surface);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+    }
+    .topbar h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      letter-spacing: 1px;
+    }
+    .icon-btn {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 28px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    #map { flex: 1; width: 100%; display: none; }
+    .loader {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .loader::after {
+      content: "";
+      width: 40px;
+      height: 40px;
+      border: 5px solid rgba(255,255,255,0.2);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      height: 56px;
+      background: var(--surface);
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.4);
+    }
+    .nav-btn {
+      color: var(--text);
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      text-decoration: none;
+    }
+    .avatar-marker {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: center;
+      border: 3px solid var(--primary);
+      box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
+    }
+    .popup { display: flex; flex-direction: column; gap: 4px; }
+    .popup button {
+      border: none;
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      color: #fff;
+    }
+    .popup .msg-btn { background: var(--primary); }
+    .popup .profile-btn { background: #4285f4; }
   </style>
 </head>
 <body>
@@ -127,45 +107,46 @@ body {
     <button id="location-toggle" class="icon-btn material-icons" title="Konum Göster/Gizle">place</button>
     <h1>LOVIXA</h1>
     <a href="notifications.html" class="icon-btn material-icons" title="Bildirimler">favorite</a>
-  </header>  <div id="loader" class="loader"></div>
-  <main id="map"></main>  <nav class="bottom-nav">
+  </header>
+  <div id="loader" class="loader"></div>
+  <main id="map"></main>
+  <nav class="bottom-nav">
     <a href="dashboard.html" class="nav-btn material-icons" title="Anasayfa">home</a>
     <a href="messages.html" class="nav-btn material-icons" title="Mesajlar">chat</a>
     <a href="profile.html" class="nav-btn material-icons" title="Profil">person</a>
-  </nav>  <script type="module">
+  </nav>
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-    import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
     const firebaseConfig = {
       apiKey: "AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E",
       authDomain: "silicon-park-462509-r3.firebaseapp.com",
       projectId: "silicon-park-462509-r3",
       storageBucket: "silicon-park-462509-r3.appspot.com",
       messagingSenderId: "463275849598",
-      appId: "1:463275849598:web:19ffa6e6e5e1ff5077252f",
-      measurementId: "G-8CTH7CQ2SS"
+      appId: "1:463275849598:web:19ffa6e6e5e1ff5077252f"
     };
-
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    let userResolved = false;
-
-    const timeout = setTimeout(() => {
-      if (!userResolved) window.location.href = "login.html";
+    const loader = document.getElementById("loader");
+    const mapEl = document.getElementById("map");
+    const showLoader = () => { loader.style.display = "flex"; mapEl.style.display = "none"; };
+    const showMap = () => { loader.style.display = "none"; mapEl.style.display = "block"; };
+    showLoader();
+    const redirectTimeout = setTimeout(() => {
+      if (!auth.currentUser) window.location.href = "login.html";
     }, 10000);
-
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        userResolved = true;
-        document.getElementById("loader").style.display = "none";
-        document.getElementById("map").style.display = "block";
-        initMapAndLocation(user);
-      }
-    });
-
-    // Harita, konum, Firestore işlemleri: initMapAndLocation fonksiyonu aşağıda
-  </script>  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&libraries=marker" async defer></script></body>
+    if (auth.currentUser) {
+      showMap();
+    } else {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          clearTimeout(redirectTimeout);
+          showMap();
+        }
+      });
+    }
+  </script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&libraries=marker" async defer></script>
+</body>
 </html>

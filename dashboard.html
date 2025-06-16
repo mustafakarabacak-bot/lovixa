@@ -2,7 +2,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LOVIXA DASHBOARD</title>
+  <title>LOVIXA DASHBOARD</title>
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
   <style>
     :root {
@@ -10,143 +10,59 @@
       --surface: #1e1e1e;
       --primary: #4caf50;
       --text: #ffffff;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 8px 12px;
-      background: var(--surface);
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
-    }
-    .topbar h1 {
-      margin: 0;
-      font-size: 1.4rem;
-      letter-spacing: 1px;
-    }
-    .icon-btn {
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 28px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 4px;
-    }
-    #map { flex: 1; width: 100%; display: none; }
-    .loader {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .loader::after {
-      content: "";
-      width: 40px;
-      height: 40px;
-      border: 5px solid rgba(255,255,255,0.2);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .bottom-nav {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      height: 56px;
-      background: var(--surface);
-      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.4);
-    }
-    .nav-btn {
-      color: var(--text);
-      font-size: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      text-decoration: none;
-    }
-    .avatar-marker {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background-size: cover;
-      background-position: center;
-      border: 3px solid var(--primary);
-      box-shadow: 0 0 6px rgba(0, 0, 0, 0.6);
-    }
-    .popup { display: flex; flex-direction: column; gap: 4px; }
-    .popup button {
-      border: none;
-      border-radius: 8px;
-      padding: 6px 12px;
-      font-size: 14px;
-      cursor: pointer;
-      color: #fff;
-    }
-    .popup .msg-btn { background: var(--primary); }
-    .popup .profile-btn { background: #4285f4; }
+      --top-h: 56px;
+      --bot-h: 56px;
+    }*{box-sizing:border-box;margin:0;padding:0}
+body{height:100vh;font-family:"Segoe UI",Arial,sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+
+/* Üst Bar */
+.topbar{position:fixed;top:0;left:0;right:0;height:var(--top-h);display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:var(--surface);box-shadow:0 2px 6px rgba(0,0,0,.4);z-index:10}
+.topbar h1{font-size:1.3rem;letter-spacing:1px}
+.icon-btn{background:none;border:none;color:var(--text);font-size:28px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+
+/* Harita Alanı */
+#map{position:absolute;top:var(--top-h);bottom:var(--bot-h);left:0;right:0;display:none}
+.loader{position:absolute;top:var(--top-h);bottom:var(--bot-h);left:0;right:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.6);z-index:9}
+.loader::after{content:"";width:42px;height:42px;border:5px solid rgba(255,255,255,.2);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* Alt Navigasyon */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:var(--bot-h);display:flex;justify-content:space-around;align-items:center;background:var(--surface);box-shadow:0 -2px 6px rgba(0,0,0,.4);z-index:10}
+.nav-btn{color:var(--text);font-size:28px;display:flex;align-items:center;justify-content:center;width:100%}
+
+/* Avatar Marker */
+.avatar-marker{width:44px;height:44px;border-radius:50%;background-size:cover;background-position:center;border:3px solid var(--primary);box-shadow:0 0 6px rgba(0,0,0,.6)}
+.popup{display:flex;flex-direction:column;gap:4px}
+.popup button{border:none;border-radius:8px;padding:6px 12px;font-size:14px;cursor:pointer;color:#fff}
+.msg-btn{background:var(--primary)}
+.profile-btn{background:#4285f4}
+
   </style>
 </head>
 <body>
-  <header class="topbar">
-    <button id="location-toggle" class="icon-btn material-icons" title="Konum Göster/Gizle">place</button>
-    <h1>LOVIXA</h1>
-    <a href="notifications.html" class="icon-btn material-icons" title="Bildirimler">favorite</a>
-  </header>
-  <div id="loader" class="loader"></div>
-  <main id="map"></main>
-  <nav class="bottom-nav">
-    <a href="dashboard.html" class="nav-btn material-icons" title="Anasayfa">home</a>
-    <a href="messages.html" class="nav-btn material-icons" title="Mesajlar">chat</a>
-    <a href="profile.html" class="nav-btn material-icons" title="Profil">person</a>
-  </nav>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-    const firebaseConfig = {
-      apiKey: "AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E",
-      authDomain: "silicon-park-462509-r3.firebaseapp.com",
-      projectId: "silicon-park-462509-r3",
-      storageBucket: "silicon-park-462509-r3.appspot.com",
-      messagingSenderId: "463275849598",
-      appId: "1:463275849598:web:19ffa6e6e5e1ff5077252f"
-    };
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const loader = document.getElementById("loader");
-    const mapEl = document.getElementById("map");
-    const showLoader = () => { loader.style.display = "flex"; mapEl.style.display = "none"; };
-    const showMap = () => { loader.style.display = "none"; mapEl.style.display = "block"; };
-    showLoader();
-    const redirectTimeout = setTimeout(() => {
-      if (!auth.currentUser) window.location.href = "login.html";
-    }, 10000);
-    if (auth.currentUser) {
-      showMap();
-    } else {
-      onAuthStateChanged(auth, (user) => {
-        if (user) {
-          clearTimeout(redirectTimeout);
-          showMap();
-        }
-      });
-    }
-  </script>
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&libraries=marker" async defer></script>
+  <header class="topbar">
+    <button id="location-toggle" class="icon-btn material-icons" title="Konum Göster/Gizle">place</button>
+    <h1>LOVIXA</h1>
+    <a href="notifications.html" class="icon-btn material-icons" title="Bildirimler">favorite</a>
+  </header>  <div id="loader" class="loader"></div>   <main id="map"></main>
+
+  <nav class="bottom-nav">     <a href="dashboard.html" class="nav-btn material-icons" title="Anasayfa">home</a>     <a href="messages.html" class="nav-btn material-icons" title="Mesajlar">chat</a>     <a href="profile.html" class="nav-btn material-icons" title="Profil">person</a>   </nav>
+
+  <script type="module">     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";     import { getAuth,onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";     import { getFirestore,doc,setDoc,collection,onSnapshot } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+    const firebaseConfig={apiKey:"AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E",authDomain:"silicon-park-462509-r3.firebaseapp.com",projectId:"silicon-park-462509-r3",storageBucket:"silicon-park-462509-r3.appspot.com",messagingSenderId:"463275849598",appId:"1:463275849598:web:19ffa6e6e5e1ff5077252f"};     const app=initializeApp(firebaseConfig);     const auth=getAuth(app);     const db=getFirestore(app);
+
+    const loader=document.getElementById("loader");     const mapEl=document.getElementById("map");     const showLoader=()=>{loader.style.display="flex";mapEl.style.display="none"};     const showMap=()=>{loader.style.display="none";mapEl.style.display="block"};     showLoader();
+
+    /* ➡️ 10 sn sonrası fallback */     const fallback=setTimeout(()=>{if(!auth.currentUser)window.location.href="login.html"},10000);
+
+    onAuthStateChanged(auth,user=>{       if(user){clearTimeout(fallback);showMap();initRealtimeMap(user)}else{console.log("[DEBUG] kullanıcı yok");}     });
+
+    let map,myMarker,visible=true;const others=new Map();
+
+    function initRealtimeMap(user){navigator.geolocation.getCurrentPosition(p=>{const pos={lat:p.coords.latitude,lng:p.coords.longitude};createMap(pos);addSelfMarker(user,pos);writeLocation(user.uid,pos);setInterval(()=>navigator.geolocation.getCurrentPosition(d=>{const n={lat:d.coords.latitude,lng:d.coords.longitude};updateSelf(n);writeLocation(user.uid,n)}),5000);listenOthers(user.uid)},e=>alert("Konum hatası "+e.message),{enableHighAccuracy:true})}
+
+    function createMap(center){map=new google.maps.Map(mapEl,{center,zoom:14,mapId:"a772948b1f9c04b5"});document.getElementById("location-toggle").onclick=()=>{visible=!visible;myMarker.map=visible?map:null}}     function avatar(url){const d=document.createElement("div");d.className="avatar-marker";d.style.backgroundImage=url(${url});return d}     function addSelfMarker(user,pos){myMarker=new google.maps.marker.AdvancedMarkerElement({map,position:pos,content:avatar(https://i.pravatar.cc/100?u=${user.uid})})}     function updateSelf(pos){if(myMarker)myMarker.position=pos}     function writeLocation(uid,c){setDoc(doc(db,"activeUsers",uid),{lat:c.lat,lng:c.lng,ts:Date.now()},{merge:true})}     function listenOthers(myUid){onSnapshot(collection(db,"activeUsers"),snap=>{snap.docChanges().forEach(ch=>{const uid=ch.doc.id;if(uid===myUid)return;const d=ch.doc.data();if(ch.type==="removed"){if(others.has(uid)){others.get(uid).map=null;others.delete(uid)}}else{let m=others.get(uid);if(!m){m=new google.maps.marker.AdvancedMarkerElement({map,position:{lat:d.lat,lng:d.lng},content:avatar(https://i.pravatar.cc/100?u=${uid})});m.addListener("gmp-click",()=>{const info=new google.maps.InfoWindow({content:<div class='popup'><button class='msg-btn' onclick=\"window.location.href='messages.html?uid=${uid}'\">Mesaj</button><button class='profile-btn' onclick=\"window.location.href='profile.html?uid=${uid}'\">Profil</button></div>});info.open(map,m)});others.set(uid,m)}else{m.position={lat:d.lat,lng:d.lng}}}})})}   </script>   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&libraries=marker" async defer></script>
+
 </body>
 </html>

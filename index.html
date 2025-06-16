@@ -40,7 +40,6 @@
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&libraries=places"></script>
 </head>
 <body>
-    <!-- Giriş Ekranı -->
     <div id="login-section">
         <div id="login-container">
             <h2>Sosyal Harita ve Mesajlaşma</h2>
@@ -53,7 +52,6 @@
         </div>
     </div>
 
-    <!-- Kullanıcı Adı Giriş Popup -->
     <div id="username-popup" style="display: none;">
         <div id="username-form">
             <h3>Lütfen Kullanıcı Adı Giriniz</h3>
@@ -63,10 +61,8 @@
         </div>
     </div>
 
-    <!-- Harita Bölümü -->
     <div id="map"></div>
 
-    <!-- Mesajlar Bölümü -->
     <div id="messages-section">
         <div class="header">
             <h3>Mesajlar</h3>
@@ -76,7 +72,6 @@
         </div>
     </div>
 
-    <!-- Sohbet Bölümü -->
     <div id="chat-section">
         <button class="back-button" onclick="showSection('messages')">&lt; Geri</button>
         <div class="header">
@@ -90,14 +85,12 @@
         </div>
     </div>
 
-    <!-- Alt Menü -->
     <div id="bottom-nav">
         <button id="home-btn" class="active" onclick="showSection('map')">Harita</button>
         <button id="messages-btn" onclick="showSection('messages')">Mesajlar</button>
     </div>
 
     <script>
-        // Firebase Konfigürasyonu
         const firebaseConfig = {
             apiKey: "AIzaSyBzUyATE4CUGvtIeZ5pf0hLreaFF4p3rSM",
             authDomain: "silicon-park-462509-r3.firebaseapp.com",
@@ -109,7 +102,6 @@
             measurementId: "G-8CTH7CQ2SS"
         };
 
-        // Firebase Başlatma (compat sürümü)
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.database();
@@ -118,7 +110,6 @@
         let currentUserId, currentUsername, currentUserPhoto, currentChatUserId, currentChatUsername, currentChatPhoto;
         let locationWatchId;
 
-        // Google ile Oturum Açma
         document.getElementById('login-button').addEventListener('click', () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             provider.addScope('profile');
@@ -126,7 +117,6 @@
             
             auth.signInWithPopup(provider)
                 .then((result) => {
-                    // Giriş başarılı
                     document.getElementById('login-error').textContent = '';
                 })
                 .catch((error) => {
@@ -145,7 +135,6 @@
                 });
         });
 
-        // Kullanıcı Durumu Kontrolü
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUserId = user.uid;
@@ -161,7 +150,6 @@
             }
         });
 
-        // Kullanıcı Adı Kontrolü ve Popup
         function checkUsername(user) {
             db.ref('users/' + user.uid).once('value').then(snapshot => {
                 if (!snapshot.exists() || !snapshot.val().username) {
@@ -177,7 +165,6 @@
             });
         }
 
-        // Kullanıcı Adı Kaydetme
         function saveUsername() {
             const username = document.getElementById('username-input').value.trim();
             if (username.length < 3) {
@@ -200,7 +187,6 @@
             });
         }
 
-        // Harita Başlatma
         function initMap(user) {
             if (!navigator.geolocation) {
                 alert('Tarayıcınız konum bilgisini desteklemiyor.');
@@ -216,12 +202,25 @@
                 map = new google.maps.Map(document.getElementById('map'), {
                     center: userLocation,
                     zoom: 15,
-                    mapTypeControl: false,
+                    disableDefaultUI: true,
+                    zoomControl: true,
                     streetViewControl: false,
-                    fullscreenControl: false
+                    mapTypeControl: false,
+                    fullscreenControl: false,
+                    styles: [
+                        {
+                            featureType: "poi",
+                            elementType: "labels",
+                            stylers: [{ visibility: "off" }]
+                        },
+                        {
+                            featureType: "transit",
+                            elementType: "labels",
+                            stylers: [{ visibility: "off" }]
+                        }
+                    ]
                 });
 
-                // Kullanıcı İşaretçisi
                 userMarker = new google.maps.Marker({
                     position: userLocation,
                     map: map,
@@ -236,20 +235,17 @@
                     title: 'Siz'
                 });
 
-                // Konum takibi başlat
                 startLocationTracking(user);
-
-                // Diğer Kullanıcıları Yükleme
                 loadOtherUsers();
             }, (error) => {
                 console.error('Konum hatası:', error);
                 alert('Konum alınamadı, varsayılan konum kullanılıyor.');
                 
-                // İstanbul varsayılan konum
                 const defaultLocation = { lat: 41.0086, lng: 28.9784 };
                 map = new google.maps.Map(document.getElementById('map'), {
                     center: defaultLocation,
-                    zoom: 10
+                    zoom: 10,
+                    disableDefaultUI: true
                 });
                 
                 userMarker = new google.maps.Marker({
@@ -267,7 +263,6 @@
             });
         }
 
-        // Konum takibi başlatma
         function startLocationTracking(user) {
             if (locationWatchId) {
                 navigator.geolocation.clearWatch(locationWatchId);
@@ -280,17 +275,14 @@
                         lng: position.coords.longitude
                     };
                     
-                    // Kullanıcı işaretçisini güncelle
                     if (userMarker) {
                         userMarker.setPosition(newLocation);
                     }
                     
-                    // Haritayı kullanıcının konumuna kaydır
                     if (map) {
                         map.panTo(newLocation);
                     }
                     
-                    // Firebase'de konumu güncelle
                     db.ref('users/' + user.uid).update({
                         location: newLocation
                     }).catch(error => {
@@ -308,7 +300,6 @@
             );
         }
 
-        // Diğer Kullanıcıları Haritaya Ekleme
         function loadOtherUsers() {
             db.ref('users').on('value', snapshot => {
                 if (!snapshot.exists()) return;
@@ -317,22 +308,18 @@
                     const userData = child.val();
                     const userId = child.key;
                     
-                    // Kendi kullanıcımızı haritada göstermeyelim
                     if (userId === currentUserId || !userData.location) return;
                     
-                    // Kullanıcı konumu
                     const userLocation = new google.maps.LatLng(
                         userData.location.lat,
                         userData.location.lng
                     );
                     
-                    // İşaretçi zaten varsa konumunu güncelle
                     if (markers[userId]) {
                         markers[userId].setPosition(userLocation);
                         return;
                     }
                     
-                    // Yeni işaretçi oluştur
                     const marker = new google.maps.Marker({
                         position: userLocation,
                         map: map,
@@ -347,7 +334,6 @@
                         title: userData.username
                     });
                     
-                    // İşaretçi tıklama olayı
                     marker.addListener('click', () => {
                         currentChatUserId = userId;
                         currentChatUsername = userData.username;
@@ -366,7 +352,6 @@
             });
         }
 
-        // Bölüm Değiştirme
         function showSection(section) {
             document.getElementById('map').style.display = section === 'map' ? 'block' : 'none';
             document.getElementById('messages-section').style.display = section === 'messages' ? 'block' : 'none';
@@ -378,14 +363,12 @@
             if (section === 'messages') {
                 loadMessages();
             } else if (section === 'map') {
-                // Haritayı yeniden boyutlandır
                 setTimeout(() => {
                     if (map) google.maps.event.trigger(map, 'resize');
                 }, 100);
             }
         }
 
-        // Mesajları Yükleme
         function loadMessages() {
             const messagesList = document.getElementById('messages-list');
             messagesList.innerHTML = '';
@@ -437,7 +420,6 @@
             });
         }
 
-        // Sohbet Mesajlarını Yükleme
         function loadChatMessages() {
             const chatMessages = document.getElementById('chat-messages');
             chatMessages.innerHTML = '';
@@ -467,7 +449,6 @@
                     chatMessages.appendChild(div);
                 });
                 
-                // En son mesaja kaydır
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }, error => {
                 console.error('Sohbet yükleme hatası:', error);
@@ -475,7 +456,6 @@
             });
         }
 
-        // Mesaj Gönderme
         function sendMessage() {
             const text = document.getElementById('chat-input').value.trim();
             if (!text || !currentChatUserId) return;
@@ -483,7 +463,6 @@
             const chatId = [currentUserId, currentChatUserId].sort().join('_');
             const timestamp = Date.now();
             
-            // Mesajı sohbete kaydet
             db.ref('chats/' + chatId).push({
                 senderId: currentUserId,
                 text: text,
@@ -491,7 +470,6 @@
             }).then(() => {
                 document.getElementById('chat-input').value = '';
                 
-                // Son mesaj bilgisini her iki kullanıcı için de güncelle
                 const lastMessageData = {
                     lastMessage: text,
                     timestamp: timestamp,
@@ -507,19 +485,16 @@
             });
         }
 
-        // Timestamp'i biçimlendirme
         function formatTimestamp(timestamp) {
             if (!timestamp) return '';
             
             const date = new Date(timestamp);
             const now = new Date();
             
-            // Bugün mü kontrolü
             if (date.toDateString() === now.toDateString()) {
                 return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
             
-            // Dün mü kontrolü
             const yesterday = new Date(now);
             yesterday.setDate(yesterday.getDate() - 1);
             
@@ -527,7 +502,6 @@
                 return 'Dün ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             }
             
-            // Bu yıl içinde mi
             if (date.getFullYear() === now.getFullYear()) {
                 return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
             }
@@ -535,7 +509,6 @@
             return date.toLocaleDateString();
         }
 
-        // Enter tuşu ile mesaj gönderme
         document.getElementById('chat-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 sendMessage();

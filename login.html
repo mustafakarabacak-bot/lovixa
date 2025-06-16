@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Lovixa - Giriş</title>
+  <script type="module" src="./login.js"></script>
+  <style>
+    :root {
+      --bg-color: #0d0d0d;
+      --card-color: #1e1e1e;
+      --primary: #4caf50;
+      --primary-hover: #43a047;
+      --accent: #4285F4;
+      --text-color: #ffffff;
+      --input-bg: #2a2a2a;
+      --input-border: #3a3a3a;
+      --transition: all 0.2s ease-in-out;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: var(--card-color);
+      padding: 2rem;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.4);
+      display: flex;
+      flex-direction: column;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+    }
+
+    input {
+      background-color: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-color);
+      padding: 0.9rem;
+      border-radius: 10px;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+      transition: var(--transition);
+    }
+
+    input:focus {
+      border-color: var(--primary);
+      outline: none;
+    }
+
+    button {
+      padding: 0.9rem;
+      border: none;
+      border-radius: 10px;
+      background-color: var(--primary);
+      color: white;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    button:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .google-btn {
+      background-color: var(--accent);
+      margin-top: 0.5rem;
+    }
+
+    .register-link {
+      margin-top: 1.5rem;
+      text-align: center;
+      font-size: 0.95rem;
+    }
+
+    .register-link a {
+      color: var(--primary);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .register-link a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        border-radius: 12px;
+        padding: 1.5rem;
+      }
+
+      h2 {
+        font-size: 1.5rem;
+      }
+
+      input, button {
+        font-size: 1rem;
+        padding: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Giriş Yap</h2>
+    <input type="email" id="email" placeholder="E-posta adresin" />
+    <input type="password" id="password" placeholder="Şifren" />
+    <button id="login-btn">Giriş Yap</button>
+    <button id="google-btn" class="google-btn">Google ile Giriş</button>
+    <div class="register-link">
+      <p>Hesabın yok mu? <a href="register.html">Kayıt Ol</a></p>
+    </div>
+  </div>
+</body>
+</html>

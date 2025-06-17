@@ -4,41 +4,41 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Konum Takip – Minimal UI</title>
-
   <style>
-    html, body { height: 100%; margin: 0; }
-    #map       { height: 100%; width: 100%; }
-
-    /* --- İsteğe bağlı: Zoom düğmelerini de gizlemek istersen: ---
-    .gm-bundled-control, .gmnoprint[controlwidth] { display:none!important; }
-    -------------------------------------------------------------- */
+    html, body { height:100%; margin:0; }
+    #map       { height:100%; width:100%; }
   </style>
 </head>
 <body>
   <div id="map"></div>
 
   <script>
-    /* SVG tabanlı daire şeklinde, içi boş “profil” ikonu  ---------*/
-    const svgCircle =
-      `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60">
-         <circle cx="30" cy="30" r="20"
-                 fill="transparent"
-                 stroke="#4285F4"
-                 stroke-width="4"/>
-       </svg>`;
+    /* ------------------------------------------------------------------
+     *  Yardımcı: Daire şeklindeki, içi boş “profil” ikonunu oluşturur.
+     *  Bu fonksiyon yalnızca google.maps yüklenince çağrılır,
+     *  dolayısıyla “google is not defined” hatası artık oluşmayacak.
+     * -----------------------------------------------------------------*/
+    function createProfileIcon() {
+      const svg =
+        `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60">
+           <circle cx="30" cy="30" r="20"
+                   fill="transparent"
+                   stroke="#4285F4"
+                   stroke-width="4"/>
+         </svg>`;
+      return {
+        url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg),
+        scaledSize: new google.maps.Size(40, 40),
+        anchor:     new google.maps.Point(20, 20)
+      };
+    }
 
-    const customIcon = {
-      url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svgCircle),
-      scaledSize:  new google.maps.Size(40, 40),
-      anchor:      new google.maps.Point(20, 20)
-    };
-
-    /* Harita + konum izleme --------------------------------------*/
+    /* ----------------- Harita ve Konum İzleme ---------------------- */
     let map, selfMarker;
 
     function initMap() {
       if (!navigator.geolocation) {
-        alert("Tarayıcı konum servisini desteklemiyor.");
+        alert("Tarayıcınız konum servisini desteklemiyor.");
         return;
       }
 
@@ -54,28 +54,31 @@
               zoom: 16,
               center: latLng,
 
-              /* İstenen kontrolleri kapatıyoruz */
-              mapTypeControl:    false,   // “Harita / Uydu”
+              /* Gereksiz kontrolleri kapatıyoruz */
+              mapTypeControl:    false,   // Sol üst “Harita/Uydu”
               fullscreenControl: false,   // Sağ üst kare
-              streetViewControl: false,   // Sağ alttaki “adam”
+              streetViewControl: false,   // Sağ alt “adam”
               rotateControl:     false,
               scaleControl:      false
-              // zoomControl:    false,  // <-- Zoom’u da kapatmak istersen aç
+              // zoomControl:  false,    // Zoom’u da gizlemek için aç
             });
 
             selfMarker = new google.maps.Marker({
-              position: latLng,
-              map:      map,
-              icon:     customIcon,
-              optimized: true    // mobil performans
+              position:  latLng,
+              map:       map,
+              icon:      createProfileIcon(),
+              optimized: true
             });
           } else {
             selfMarker.setPosition(latLng);
             map.setCenter(latLng);
           }
         },
-        err  => alert("Konum alınamadı: " + err.message),
-        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+        err => {
+          console.error("Konum Hatası:", err);
+          alert("Konum alınamadı: " + err.message);
+        },
+        { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
       );
     }
   </script>

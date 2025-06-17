@@ -3,67 +3,85 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Konum Takip</title>
+  <title>Konum Takip – Minimal UI</title>
+
   <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-    #map {
-      height: 100%;
-      width: 100%;
-    }
+    html, body { height: 100%; margin: 0; }
+    #map       { height: 100%; width: 100%; }
+
+    /* --- İsteğe bağlı: Zoom düğmelerini de gizlemek istersen: ---
+    .gm-bundled-control, .gmnoprint[controlwidth] { display:none!important; }
+    -------------------------------------------------------------- */
   </style>
 </head>
 <body>
   <div id="map"></div>
 
   <script>
-    let map, marker;
+    /* SVG tabanlı daire şeklinde, içi boş “profil” ikonu  ---------*/
+    const svgCircle =
+      `<svg xmlns="http://www.w3.org/2000/svg" width="60" height="60">
+         <circle cx="30" cy="30" r="20"
+                 fill="transparent"
+                 stroke="#4285F4"
+                 stroke-width="4"/>
+       </svg>`;
+
+    const customIcon = {
+      url: "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svgCircle),
+      scaledSize:  new google.maps.Size(40, 40),
+      anchor:      new google.maps.Point(20, 20)
+    };
+
+    /* Harita + konum izleme --------------------------------------*/
+    let map, selfMarker;
 
     function initMap() {
-      if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-          (position) => {
-            const pos = {
-              lat: position.coords.latitude,
-              lng: position.coords.longitude,
-            };
-
-            if (!map) {
-              map = new google.maps.Map(document.getElementById("map"), {
-                zoom: 16,
-                center: pos,
-              });
-
-              marker = new google.maps.Marker({
-                position: pos,
-                map: map,
-                title: "Şu anki konumunuz",
-              });
-            } else {
-              marker.setPosition(pos);
-              map.setCenter(pos);
-            }
-          },
-          () => {
-            alert("Konum bilgisi alınamadı.");
-          },
-          {
-            enableHighAccuracy: true,
-            maximumAge: 0,
-            timeout: 10000,
-          }
-        );
-      } else {
-        alert("Tarayıcınız konum hizmetlerini desteklemiyor.");
+      if (!navigator.geolocation) {
+        alert("Tarayıcı konum servisini desteklemiyor.");
+        return;
       }
+
+      navigator.geolocation.watchPosition(
+        pos => {
+          const latLng = {
+            lat: pos.coords.latitude,
+            lng: pos.coords.longitude
+          };
+
+          if (!map) {
+            map = new google.maps.Map(document.getElementById("map"), {
+              zoom: 16,
+              center: latLng,
+
+              /* İstenen kontrolleri kapatıyoruz */
+              mapTypeControl:    false,   // “Harita / Uydu”
+              fullscreenControl: false,   // Sağ üst kare
+              streetViewControl: false,   // Sağ alttaki “adam”
+              rotateControl:     false,
+              scaleControl:      false
+              // zoomControl:    false,  // <-- Zoom’u da kapatmak istersen aç
+            });
+
+            selfMarker = new google.maps.Marker({
+              position: latLng,
+              map:      map,
+              icon:     customIcon,
+              optimized: true    // mobil performans
+            });
+          } else {
+            selfMarker.setPosition(latLng);
+            map.setCenter(latLng);
+          }
+        },
+        err  => alert("Konum alınamadı: " + err.message),
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+      );
     }
   </script>
 
   <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&callback=initMap">
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&callback=initMap">
   </script>
 </body>
 </html>

@@ -1,392 +1,69 @@
-<!DOCTYPE html><html lang="tr">
+<!DOCTYPE html>
+<html lang="tr">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lovixa | Gerçek‑Zamanlı Konum Paylaşımı</title><!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-<style>
-    /* === DARK MATERIAL THEME === */
-    :root {
-        --bg: #0d0d0d;
-        --surface: #1e1e1e;
-        --primary: #4caf50;
-        --accent: #4285f4;
-        --text: #ffffff;
-        --radius: 16px;
-        --trans: all 0.2s ease;
-        --top-h: 56px;
-        --bot-h: 56px;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Konum Takip</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
     }
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Segoe UI", sans-serif;
+    #map {
+      height: 100%;
+      width: 100%;
     }
-    body {
-        background: var(--bg);
-        color: var(--text);
-        height: 100vh;
-        overflow: hidden;
-    }
-    .centered {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .card {
-        background: var(--surface);
-        padding: 2rem;
-        border-radius: var(--radius);
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        width: 100%;
-        max-width: 400px;
-    }
-    h2 {
-        text-align: center;
-        font-size: 1.8rem;
-        margin-bottom: 1rem;
-    }
-    input, button {
-        padding: 0.9rem;
-        font-size: 1rem;
-        border-radius: 10px;
-        border: none;
-        transition: var(--trans);
-    }
-    input {
-        background: #2a2a2a;
-        border: 1px solid #3a3a3a;
-        color: var(--text);
-    }
-    input:focus {
-        border-color: var(--primary);
-        outline: none;
-    }
-    button {
-        background: var(--primary);
-        color: #ffffff;
-        cursor: pointer;
-        font-weight: 600;
-    }
-    button:hover {
-        background: #43a047;
-        transform: translateY(-2px);
-    }
-    button.google { background: var(--accent); }
-    .link { text-align: center; font-size: 0.95rem; margin-top: 0.5rem; }
-    .link a { color: var(--primary); text-decoration: none; font-weight: 600; }
-    .link a:hover { text-decoration: underline; }
-
-    /* === DASHBOARD === */
-    .topbar {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        height: var(--top-h);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 12px;
-        background: var(--surface);
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-        z-index: 10;
-    }
-    .icon {
-        background: none;
-        border: none;
-        font-size: 24px;
-        color: var(--text);
-        cursor: pointer;
-        width: 44px; height: 44px;
-        display: flex; align-items: center; justify-content: center;
-        border-radius: 50%;
-        transition: var(--trans);
-    }
-    .icon:hover { background: rgba(255,255,255,0.1); }
-    .map { position: absolute; top: var(--top-h); bottom: var(--bot-h); left: 0; right: 0; z-index: 1; }
-    .loader {
-        position: absolute; top: var(--top-h); bottom: var(--bot-h); left: 0; right: 0;
-        display: flex; align-items: center; justify-content: center;
-        background: rgba(0,0,0,0.8); z-index: 9;
-    }
-    .loader::after {
-        content: ""; width: 48px; height: 48px; border: 5px solid rgba(255,255,255,0.2);
-        border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .bottom-nav {
-        position: fixed; bottom: 0; left: 0; right: 0;
-        height: var(--bot-h);
-        display: flex; justify-content: space-around; align-items: center;
-        background: var(--surface);
-        box-shadow: 0 -2px 6px rgba(0,0,0,0.4);
-        z-index: 10;
-    }
-    .avatar-marker {
-        width: 44px; height: 44px; border-radius: 50%;
-        background-size: cover; background-position: center;
-        border: 3px solid var(--primary);
-        box-shadow: 0 0 6px rgba(0,0,0,0.6);
-    }
-    .page { display: none; height: 100%; }
-    .page.active { display: block; }
-    .logo {
-        font-weight: 800; letter-spacing: 1px;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        -webkit-background-clip: text; background-clip: text; color: transparent;
-        font-size: 1.8rem;
-    }
-    .error-message, .success-message {
-        padding: 10px; border-radius: 8px; text-align: center; margin-top: 10px; display: none;
-    }
-    .error-message { background: #f44336; color: #fff; }
-    .success-message { background: var(--primary); color: #fff; }
-</style>
-
+  </style>
 </head>
 <body>
-    <!-- === LOGIN === -->
-    <div id="login-page" class="page active">
-        <section class="centered">
-            <div class="card">
-                <h2 class="logo">LOVIXA</h2>
-                <p style="text-align:center; margin-bottom:1.5rem; opacity:.8;">Gerçek zamanlı konum paylaşım platformu</p>
-                <div id="login-error" class="error-message"></div>
-                <input id="email" type="email" placeholder="E‑posta adresi" />
-                <input id="password" type="password" placeholder="Şifre" />
-                <button id="login-btn">Giriş Yap</button>
-                <button id="google-btn" class="google">Google ile Giriş</button>
-                <p class="link">Hesabın yok mu? <a href="#" id="go-to-register">Kayıt Ol</a></p>
-            </div>
-        </section>
-    </div><!-- === REGISTER === -->
-<div id="register-page" class="page">
-    <section class="centered">
-        <div class="card">
-            <h2 class="logo">LOVIXA</h2>
-            <p style="text-align:center; margin-bottom:1.5rem; opacity:.8;">Yeni hesap oluştur</p>
-            <div id="register-error" class="error-message"></div>
-            <div id="register-success" class="success-message">Kayıt başarılı! Giriş yapılıyor…</div>
-            <input id="reg-email" type="email" placeholder="E‑posta adresi" />
-            <input id="reg-password" type="password" placeholder="Şifre (min 6 kr.)" />
-            <button id="register-btn">Kayıt Ol</button>
-            <button id="google-register-btn" class="google">Google ile Kayıt Ol</button>
-            <p class="link">Zaten hesabın var mı? <a href="#" id="go-to-login">Giriş Yap</a></p>
-        </div>
-    </section>
-</div>
+  <div id="map"></div>
 
-<!-- === DASHBOARD === -->
-<div id="dashboard-page" class="page">
-    <header class="topbar">
-        <button id="location-toggle" class="icon">📍</button>
-        <h1 class="logo">LOVIXA</h1>
-        <button id="logout-btn" class="icon">↩︎</button>
-    </header>
-    <main id="map" class="map"></main>
-    <div id="loader" class="loader"></div>
-    <nav class="bottom-nav">
-        <a href="#" class="icon" data-page="dashboard">🏠</a>
-        <a href="#" class="icon" data-page="messages">💬</a>
-        <a href="#" class="icon" data-page="profile">👤</a>
-    </nav>
-</div>
+  <script>
+    let map, marker;
 
-<!-- Dependencies -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    function initMap() {
+      if (navigator.geolocation) {
+        navigator.geolocation.watchPosition(
+          (position) => {
+            const pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
 
-<script>
-    /* === CONFIGURATION === */
-    const firebaseConfig = {
-        apiKey: "AIzaSyBzUyATE4CUGvtIeZ5pf0hLreaFF4p3rSM",
-        authDomain: "silicon-park-462509-r3.firebaseapp.com",
-        projectId: "silicon-park-462509-r3",
-        storageBucket: "silicon-park-462509-r3.appspot.com",
-        messagingSenderId: "463275849598",
-        appId: "1:463275849598:web:19ffa6e6e5e1ff5077252f"
-    };
+            if (!map) {
+              map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 16,
+                center: pos,
+              });
 
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db   = firebase.firestore();
-
-    /* == GLOBALS == */
-    let map, myMarker, watchId = null, visible = true;
-    const others = new Map();
-    const STALE = 15_000; // 15 s presence threshold
-
-    /* === UI HELPERS === */
-    const showPage = id => {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-    };
-    const showError = (id, msg) => {
-        const el = document.getElementById(id);
-        el.textContent = msg; el.style.display = 'block';
-        setTimeout(() => el.style.display = 'none', 5_000);
-    };
-    const avatarIcon = uid => L.divIcon({
-        html:`<div class="avatar-marker" style="background-image:url(https://i.pravatar.cc/100?u=${uid})"></div>` ,
-        iconSize:[44,44], className:''
-    });
-
-    /* === AUTH PERSISTENCE === */
-    auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL).catch(console.error);
-
-    /* === NAVIGATION === */
-    document.getElementById('go-to-register').onclick = e => { e.preventDefault(); showPage('register-page'); };
-    document.getElementById('go-to-login').onclick    = e => { e.preventDefault(); showPage('login-page'); };
-
-    /* === EMAIL LOGIN === */
-    document.getElementById('login-btn').onclick = async () => {
-        const email = emailInput.value.trim();
-        const pass  = passwordInput.value;
-        if (!email || !pass) return showError('login-error', 'Lütfen e‑posta ve şifre giriniz.');
-        try {
-            await auth.signInWithEmailAndPassword(email, pass);
-        } catch (err) {
-            console.error('[LOGIN]', err);
-            showError('login-error', `Kod: ${err.code}`);
-        }
-    };
-
-    /* === GOOGLE LOGIN === */
-    const googleLogin = async () => {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        try {
-            await auth.signInWithPopup(provider);
-        } catch (err) {
-            if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
-                await auth.signInWithRedirect(provider);
+              marker = new google.maps.Marker({
+                position: pos,
+                map: map,
+                title: "Şu anki konumunuz",
+              });
             } else {
-                console.error('[GOOGLE LOGIN]', err);
-                showError('login-error', `Google giriş hatası: ${err.message}`);
+              marker.setPosition(pos);
+              map.setCenter(pos);
             }
-        }
-    };
-    document.getElementById('google-btn').onclick = googleLogin;
-
-    /* === REGISTER === */
-    document.getElementById('register-btn').onclick = async () => {
-        const email = regEmail.value.trim();
-        const pass  = regPassword.value;
-        if (!email) return showError('register-error', 'Geçerli bir e‑posta giriniz.');
-        if (pass.length < 6) return showError('register-error', 'Şifre en az 6 karakter olmalı.');
-        try {
-            await auth.createUserWithEmailAndPassword(email, pass);
-            registerSuccess.style.display = 'block';
-            setTimeout(() => showPage('dashboard-page'), 2_000);
-        } catch (err) {
-            console.error('[REGISTER]', err);
-            showError('register-error', `Kod: ${err.code}`);
-        }
-    };
-    document.getElementById('google-register-btn').onclick = googleLogin;
-
-    /* === LOGOUT === */
-    document.getElementById('logout-btn').onclick = async () => {
-        if (watchId) navigator.geolocation.clearWatch(watchId);
-        const uid = auth.currentUser?.uid;
-        if (uid) await db.collection('activeUsers').doc(uid).delete().catch(console.warn);
-        await auth.signOut();
-        showPage('login-page');
-    };
-
-    /* === AUTH STATE === */
-    auth.onAuthStateChanged(user => {
-        if (user) {
-            showPage('dashboard-page');
-            initDashboard(user);
-        } else {
-            showPage('login-page');
-        }
-    });
-
-    /* === DASHBOARD === */
-    async function initDashboard(user) {
-        document.getElementById('loader').style.display = 'none';
-        try {
-            const { coords } = await getCurrentPos();
-            initMap(coords.latitude, coords.longitude, user);
-        } catch (err) {
-            console.error('Konum alınamadı:', err);
-            initMap(41.0082, 28.9784, user); // default Istanbul
-            alert('Konum alınamadı. Lütfen erişim izni verin.');
-        }
-    }
-
-    function initMap(lat, lng, user) {
-        map = L.map('map',{ zoomControl:false, attributionControl:false })
-                .setView([lat,lng],14);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-            subdomains:'abcd', maxZoom:19
-        }).addTo(map);
-        myMarker = L.marker([lat,lng],{ icon: avatarIcon(user.uid) }).addTo(map);
-        startWatch(user);
-        listenOthers(user.uid);
-    }
-
-    /* === GEOLOCATION === */
-    function startWatch(user) {
-        locationToggle.onclick = () => {
-            visible = !visible;
-            visible ? (map.addLayer(myMarker), locationToggle.textContent='📍')
-                     : (map.removeLayer(myMarker), locationToggle.textContent='🚫');
-        };
-        watchId = navigator.geolocation.watchPosition(async pos => {
-            const { latitude:lat, longitude:lng } = pos.coords;
-            if (myMarker) myMarker.setLatLng([lat,lng]);
-            await db.collection('activeUsers').doc(user.uid).set({
-                lat, lng, ts: firebase.firestore.FieldValue.serverTimestamp()
-            },{ merge:true });
-        }, console.error, { enableHighAccuracy:true, maximumAge:10_000 });
-    }
-
-    /* === REALTIME PRESENCE === */
-    function listenOthers(myUid) {
-        db.collection('activeUsers').onSnapshot(snap => {
-            const now = Date.now();
-            snap.forEach(doc => {
-                const uid = doc.id; if (uid===myUid) return;
-                const data = doc.data(); if (!data.lat || !data.lng) return;
-                const age = now - (data.ts?.toMillis?.() || 0);
-                if (age > STALE) {
-                    if (others.has(uid)) { map.removeLayer(others.get(uid)); others.delete(uid);} return;
-                }
-                let marker = others.get(uid);
-                if (!marker) {
-                    marker = L.marker([data.lat,data.lng],{ icon: avatarIcon(uid) }).addTo(map);
-                    others.set(uid, marker);
-                } else {
-                    marker.setLatLng([data.lat,data.lng]);
-                }
-            });
-        });
-    }
-
-    /* === UTIL === */
-    function getCurrentPos() {
-        return new Promise((res,rej) =>
-            navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy:true, timeout:10_000, maximumAge:0 })
+          },
+          () => {
+            alert("Konum bilgisi alınamadı.");
+          },
+          {
+            enableHighAccuracy: true,
+            maximumAge: 0,
+            timeout: 10000,
+          }
         );
+      } else {
+        alert("Tarayıcınız konum hizmetlerini desteklemiyor.");
+      }
     }
+  </script>
 
-    /* === ELEMENT SHORTCUTS === */
-    const emailInput        = document.getElementById('email');
-    const passwordInput     = document.getElementById('password');
-    const regEmail          = document.getElementById('reg-email');
-    const regPassword       = document.getElementById('reg-password');
-    const registerSuccess   = document.getElementById('register-success');
-    const locationToggle    = document.getElementById('location-toggle');
-</script>
-
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&callback=initMap">
+  </script>
 </body>
 </html>

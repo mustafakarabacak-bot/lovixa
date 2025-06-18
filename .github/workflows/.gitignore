@@ -1,0 +1,12 @@
+# Firebase Service Account Key
+firebase-key.json
+
+# Sistem & editör dosyaları
+.DS_Store
+*.log
+*.env
+
+# Node & derleme çıktıları (ilerisi için)
+node_modules/
+dist/
+build/

@@ -1,0 +1,70 @@
+<!-- /pages/dashboard.html -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lovixa | Dashboard</title>
+
+  <!-- Leaflet CSS (map.js bunu kullanacak) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Basit tema değişkenleri -->
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #1e1e1e;
+      --primary: #4caf50;
+      --accent: #4285f4;
+      --text: #ffffff;
+      --radius: 16px;
+      --trans: all 0.2s ease;
+      --top-h: 56px;
+      --bot-h: 56px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Harita alanı üst ve alt bar arasında tam esner */
+    #map {
+      flex: 1;
+      width: 100%;
+      background: #000; /* Harita yüklenene kadar boş zemin */
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Topbar yerleştirme -->
+  <div id="topbar-placeholder"></div>
+
+  <!-- Ana içerik: Harita -->
+  <div id="map"></div>
+
+  <!-- Bottom-nav yerleştirme -->
+  <div id="bottom-nav-placeholder"></div>
+
+  <!-- Bileşenleri fetch ile içeri al -->
+  <script>
+    async function include(path, targetId) {
+      const res = await fetch(path);
+      document.getElementById(targetId).innerHTML = await res.text();
+    }
+    include("/components/topbar.html", "topbar-placeholder");
+    include("/components/bottom-nav.html", "bottom-nav-placeholder");
+  </script>
+
+  <!-- Modüler script’ler -->
+  <script type="module" src="/scripts/map.js"></script>
+  <script type="module" src="/scripts/search.js"></script>
+</body>
+</html>

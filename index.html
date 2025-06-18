@@ -1,55 +1,66 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lovixa | Konum Takibi</title>
+  <meta charset="UTF-8" />
+  <meta http-equiv="refresh" content="5" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lovixa | Yönlendiriliyor...</title>
   <style>
-    /* Genel reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
     body {
-      background-color: #121212;
-      font-family: "Segoe UI", sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      margin: 0;
       height: 100vh;
-      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #0d0d0d;
+      color: #ffffff;
+      font-family: "Segoe UI", sans-serif;
+      flex-direction: column;
     }
-
-    .map-wrapper {
-      width: 90%;
-      max-width: 600px;
-      height: 500px;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 0 16px rgba(0, 0, 0, 0.5);
-      border: 2px solid #2e2e2e;
-      background-color: #1e1e1e;
-      position: relative;
+    .spinner {
+      margin-top: 20px;
+      border: 6px solid #333;
+      border-top: 6px solid #4caf50;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
     }
-
-    #map {
-      width: 100%;
-      height: 100%;
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
+  <div>Oturum kontrol ediliyor...</div>
+  <div class="spinner"></div>
 
-  <div class="map-wrapper">
-    <div id="map"></div>
-  </div>
+  <!-- Firebase Yönlendirme Kontrolü -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-  <!-- JS dosyaları -->
-  <script src="map.js"></script>
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E&callback=initMap">
+    const firebaseConfig = {
+      apiKey:            "AIzaSyDslfjDqEpqQekNxh9e4OqYYkxdf2TUI7E",
+      authDomain:        "silicon-park-462509-r3.firebaseapp.com",
+      projectId:         "silicon-park-462509-r3",
+      storageBucket:     "silicon-park-462509-r3.appspot.com",
+      messagingSenderId: "463275849598",
+      appId:             "1:463275849598:web:19ffa6e6e5e1ff5077252f"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Kullanıcı giriş yaptıysa dashboard sayfasına yönlendir
+        window.location.href = "dashboard.html";
+      } else {
+        // Giriş yapılmamışsa login-register sayfasına yönlendir
+        window.location.href = "loginregisterpage.html";
+      }
+    });
   </script>
 </body>
 </html>

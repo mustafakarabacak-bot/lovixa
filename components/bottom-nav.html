@@ -1,0 +1,49 @@
+<!-- /components/bottom-nav.html -->
+<nav style="
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 56px;
+  background: var(--surface);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #333;
+  z-index: 1000;
+">
+  <a href="dashboard.html" class="nav-item">
+    <span>🏠</span>
+  </a>
+  <a href="map.html" class="nav-item">
+    <span>🗺️</span>
+  </a>
+  <a href="notifications.html" class="nav-item">
+    <span>🔔</span>
+  </a>
+  <a href="profile.html" class="nav-item">
+    <span>👤</span>
+  </a>
+</nav>
+
+<style>
+  .nav-item {
+    color: var(--text);
+    text-decoration: none;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 25%;
+    transition: var(--trans);
+  }
+
+  .nav-item.active {
+    color: var(--primary);
+  }
+
+  .nav-item:hover {
+    opacity: 0.8;
+  }
+</style>

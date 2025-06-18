@@ -61,7 +61,7 @@ const firebaseConfig = {
     const auth = getAuth(app);
 
     onAuthStateChanged(auth, (user) => {
-      const target = user ? "dashboard.html" : "login.html"; // loginregisterpage.html yerine login.html önerisi
+      const target = user ? "dashboard.html" : "loginregisterpage.html"; // loginregisterpage.html yerine login.html önerisi
       window.location.replace(target);
     });
   </script>

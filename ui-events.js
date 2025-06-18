@@ -1,37 +1,42 @@
-import { watchAuthState } from "./auth.js";
-import { getUserProfile } from "./firebase.js";
-
-// Aktif menüyü vurgula
-const path = location.pathname.split("/").pop();
-document.querySelectorAll(".bottom-nav a").forEach(a => {
-  if (a.getAttribute("href") === path) a.classList.add("active");
-});
-
-// Profil resmini yükle
-watchAuthState(async user => {
-  if (!user) return;
-  const prof = await getUserProfile(user.uid);
-  if (prof?.photoURL) {
-    const avatar = document.getElementById("nav-avatar");
-    if (avatar) avatar.src = prof.photoURL;
+function initUIEvents() {
+  // Artı butonu etkileşimi
+  const addButton = document.querySelector('.add-button');
+  if (addButton) {
+    addButton.addEventListener('click', (e) => {
+      const menu = document.querySelector('.add-menu');
+      menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+      e.stopPropagation();
+    });
+    
+    document.addEventListener('click', () => {
+      document.querySelector('.add-menu').style.display = 'none';
+    });
   }
-});
+  
+  // Menü aktif öğesini güncelle
+  updateActiveMenu();
+  
+  // Hikaye ve fotoğraf butonları
+  document.getElementById('add-story')?.addEventListener('click', () => {
+    console.log('Hikaye ekleme tetiklendi');
+    // Hikaye ekleme mantığı
+  });
+  
+  document.getElementById('add-photo')?.addEventListener('click', () => {
+    console.log('Fotoğraf paylaşma tetiklendi');
+    // Fotoğraf paylaşma mantığı
+  });
+}
 
-// Plus menü toggle
-const plusBtn = document.getElementById("plus-btn");
-const plusMenu = document.getElementById("plus-menu");
-
-if (plusBtn && plusMenu) {
-  plusBtn.onclick = () => {
-    plusMenu.style.display = plusMenu.style.display === "flex" ? "none" : "flex";
-  };
-
-  window.addEventListener("click", e => {
-    if (e.target !== plusBtn && !plusMenu.contains(e.target)) {
-      plusMenu.style.display = "none";
+function updateActiveMenu() {
+  const path = window.location.pathname.split('/').pop();
+  const menuItems = document.querySelectorAll('.nav-item');
+  
+  menuItems.forEach(item => {
+    item.classList.remove('active');
+    const link = item.getAttribute('href');
+    if (link && link.includes(path)) {
+      item.classList.add('active');
     }
   });
-
-  document.getElementById("story-btn").onclick = () => alert("Hikâye Ekle Açılacak");
-  document.getElementById("photo-btn").onclick = () => alert("Fotoğraf Paylaş Açılacak");
 }

@@ -1,13 +1,13 @@
 <!-- topbar.html -->
 <header class="topbar">
-  <button id="msg-btn" class="icon"><i class="ph-paper-plane-tilt-bold"></i></button>
+  <img id="avatar-top" src="https://via.placeholder.com/32" class="avatar" alt="profil" />
 
-  <div class="search-wrapper">
-    <input type="text" id="search-input" placeholder="Ara…" autocomplete="off" />
+  <div class="search-container">
+    <input type="text" id="search-input" placeholder="Ara..." autocomplete="off" />
     <div id="search-drop" class="drop"></div>
   </div>
 
-  <img id="avatar-top" src="https://via.placeholder.com/32" class="avatar" alt="profil" />
+  <button id="msg-btn"><i class="ph-paper-plane-tilt-bold"></i></button>
 </header>
 
 <style>
@@ -20,63 +20,76 @@
     background: #1e1e1e;
     display: flex;
     align-items: center;
-    gap: 12px;
     padding: 0 12px;
+    gap: 12px;
     border-bottom: 1px solid #333;
-    z-index: 1000;
+    z-index: 999;
   }
-  .topbar .icon {
-    background: none;
-    border: 0;
-    color: #fff;
-    font-size: 22px;
-    cursor: pointer;
-  }
-  .avatar {
+
+  .topbar .avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
     object-fit: cover;
     cursor: pointer;
   }
-  .search-wrapper {
+
+  .topbar button {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  .search-container {
     flex: 1;
     position: relative;
   }
+
   #search-input {
     width: 100%;
     height: 36px;
     border-radius: 18px;
     border: none;
-    padding: 0 16px;
     background: #2a2a2a;
+    padding: 0 16px;
     color: #fff;
     font-size: 0.9rem;
   }
+
   .drop {
     position: absolute;
     top: 42px;
     left: 0;
     right: 0;
-    max-height: 60vh;
-    overflow: auto;
     background: #1e1e1e;
     border: 1px solid #333;
     border-radius: 12px;
+    overflow-y: auto;
+    max-height: 60vh;
     display: none;
+    z-index: 1001;
   }
+
   .result-row {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 12px;
+    padding: 10px 16px;
     cursor: pointer;
   }
+
+  .result-row:hover {
+    background: #2a2a2a;
+  }
+
   .result-row img {
     width: 36px;
     height: 36px;
     border-radius: 50%;
   }
+
   .result-row button {
     margin-left: auto;
     background: #4caf50;
@@ -86,8 +99,5 @@
     font-size: 0.75rem;
     color: #fff;
     cursor: pointer;
-  }
-  .result-row:hover {
-    background: #2a2a2a;
   }
 </style>

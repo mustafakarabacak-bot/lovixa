@@ -1,4 +1,3 @@
-<!-- loginregisterpage.html | Lovixa Unified Auth Page -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -6,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lovixa | Giriş & Kayıt</title>
 
-  <!-- Simple reset & theme variables -->
   <style>
     :root {
       --bg: #0d0d0d;
@@ -34,7 +32,6 @@
 
     h1 { margin: 0 0 1rem 0; font-size: 1.6rem; text-align: center; }
 
-    /* container card */
     .card {
       width: 100%;
       max-width: var(--maxw);
@@ -68,11 +65,9 @@
     }
     button:hover { opacity: .85; }
 
-    /* link row */
     .links { display: flex; flex-wrap: wrap; gap: .5rem 1rem; justify-content: center; font-size: .8rem; margin-top: 2rem; }
     .links a { color: var(--accent); text-decoration: none; }
 
-    /* tabs */
     .tab-row { display: flex; justify-content: center; gap: .5rem; margin-bottom: 1rem; }
     .tab-row button {
       background: transparent;
@@ -87,14 +82,12 @@
     .section { display: none; }
     .section.show { display: flex; flex-direction: column; gap: 1rem; }
 
-    /* language */
     .lang { position: absolute; top: .75rem; left: 50%; transform: translateX(-50%); font-size: .8rem; }
     .lang select { background: transparent; color: var(--text); border: none; }
   </style>
 </head>
 <body>
 
-  <!-- Language Switcher -->
   <div class="lang">
     <select id="lang">
       <option value="tr" selected>TR</option>
@@ -105,14 +98,12 @@
   <div class="card">
     <h1>Lovixa</h1>
 
-    <!-- Tabs -->
     <div class="tab-row">
       <button id="login-tab" class="active">Giriş</button>
       <button id="register-tab">Kayıt</button>
       <button id="forgot-tab">Şifremi Unuttum</button>
     </div>
 
-    <!-- Login Section -->
     <div id="login-section" class="section show">
       <label>Kullanıcı Adı veya E‑posta
         <input id="login-id" type="text" required />
@@ -124,7 +115,6 @@
       <button id="google-btn" style="background: var(--accent);">Google ile Giriş</button>
     </div>
 
-    <!-- Register Section -->
     <div id="register-section" class="section">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
         <label>Ad
@@ -165,7 +155,6 @@
       <button id="register-btn">Kayıt Ol</button>
     </div>
 
-    <!-- Forgot Section -->
     <div id="forgot-section" class="section">
       <label>Kayıtlı E‑posta Adresi
         <input id="forgot-email" type="email" required />
@@ -173,7 +162,6 @@
       <button id="forgot-btn">Sıfırlama E‑postası Gönder</button>
     </div>
 
-    <!-- Footer Links -->
     <div class="links">
       <a href="terms.html" target="_blank">Kullanıcı Sözleşmesi</a>
       <a href="faq.html" target="_blank">SSS</a>
@@ -181,72 +169,115 @@
     </div>
   </div>
 
-  <!-- Firebase & Auth Logic -->
-  <script type="module">
-    import { loginWithEmailOrUsername, loginWithGoogle, registerWithEmail, logout } from '../scripts/auth.js';
-    import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
-    import { app } from '../scripts/firebase.js';
+  <script>
+    // Firebase simülasyonu (gerçek uygulamada firebase.js ve auth.js import edilmeli)
+    const auth = {
+      currentUser: null,
+      async signInWithEmailAndPassword(email, password) {
+        console.log('Giriş denemesi:', email, password);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.currentUser = { email };
+            resolve({ user: this.currentUser });
+          }, 1000);
+        });
+      },
+      async createUserWithEmailAndPassword(email, password) {
+        console.log('Kayıt denemesi:', email, password);
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            this.currentUser = { email };
+            resolve({ user: this.currentUser });
+          }, 1000);
+        });
+      },
+      async sendPasswordResetEmail(email) {
+        console.log('Şifre sıfırlama e-postası gönderildi:', email);
+        return new Promise((resolve) => {
+          setTimeout(() => resolve(), 1000);
+        });
+      }
+    };
 
-    /* ui helpers */
+    // UI Helpers
     const qs = (sel) => document.querySelector(sel);
     const show = (id) => {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
       qs(id).classList.add('show');
       document.querySelectorAll('.tab-row button').forEach(b => b.classList.remove('active'));
-      const map = { '#login-section':'login-tab', '#register-section':'register-tab', '#forgot-section':'forgot-tab' };
+      const map = { 
+        '#login-section':'login-tab', 
+        '#register-section':'register-tab', 
+        '#forgot-section':'forgot-tab' 
+      };
       qs('#'+map[id]).classList.add('active');
     };
 
-    /* tab switching */
-    qs('#login-tab').onclick   = () => show('#login-section');
-    qs('#register-tab').onclick= () => show('#register-section');
+    // Tab switching
+    qs('#login-tab').onclick = () => show('#login-section');
+    qs('#register-tab').onclick = () => show('#register-section');
     qs('#forgot-tab').onclick = () => show('#forgot-section');
 
-    /* show/hide password */
+    // Show password toggle
     qs('#show-pass').onchange = (e) => {
       const type = e.target.checked ? 'text' : 'password';
-      qs('#reg-pass').type = qs('#reg-pass2').type = type;
+      qs('#reg-pass').type = type;
+      qs('#reg-pass2').type = type;
     };
 
-    /* login */
+    // Auth functions
     qs('#login-btn').onclick = async () => {
       try {
-        await loginWithEmailOrUsername(qs('#login-id').value, qs('#login-pass').value);
-        window.location.replace('dashboard.html');
-      } catch(err) { alert(err.message); }
+        await auth.signInWithEmailAndPassword(qs('#login-id').value, qs('#login-pass').value);
+        alert('Giriş başarılı! Dashboarda yönlendiriliyorsunuz...');
+        // window.location.replace('dashboard.html');
+      } catch (err) {
+        alert('Giriş başarısız: ' + err.message);
+      }
     };
 
-    /* google login */
     qs('#google-btn').onclick = async () => {
       try {
-        await loginWithGoogle();
-        window.location.replace('dashboard.html');
-      } catch(err) { alert(err.message); }
+        alert('Google ile giriş simülasyonu (gerçek uygulamada Firebase Auth kullanılacak)');
+        // window.location.replace('dashboard.html');
+      } catch (err) {
+        alert('Google ile giriş başarısız: ' + err.message);
+      }
     };
 
-    /* register */
     qs('#register-btn').onclick = async () => {
-      const email = qs('#reg-email').value;
-      const pass  = qs('#reg-pass').value;
-      const pass2 = qs('#reg-pass2').value;
-      if(pass!==pass2) return alert('Parolalar eşleşmiyor');
+      if (qs('#reg-pass').value !== qs('#reg-pass2').value) {
+        return alert('Parolalar eşleşmiyor!');
+      }
       try {
-        await registerWithEmail(email, pass);
-        alert('Kayıt başarıyla tamamlandı, şimdi giriş yapabilirsiniz');
+        await auth.createUserWithEmailAndPassword(qs('#reg-email').value, qs('#reg-pass').value);
+        alert('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...');
         show('#login-section');
-      } catch(err) { alert(err.message); }
+        // window.location.replace('dashboard.html');
+      } catch (err) {
+        alert('Kayıt başarısız: ' + err.message);
+      }
     };
 
-    /* forgot */
     qs('#forgot-btn').onclick = async () => {
-      const email = qs('#forgot-email').value;
       try {
-        const auth = getAuth(app);
-        await sendPasswordResetEmail(auth, email);
-        alert('Şifre sıfırlama e-postası gönderildi');
+        await auth.sendPasswordResetEmail(qs('#forgot-email').value);
+        alert('Şifre sıfırlama e-postası gönderildi!');
         show('#login-section');
-      } catch(err) { alert(err.message); }
+      } catch (err) {
+        alert('Hata oluştu: ' + err.message);
+      }
     };
+
+    // Language switcher
+    qs('#lang').onchange = (e) => {
+      alert('Dil değiştirildi: ' + e.target.value + '\n(Gerçek uygulamada dil dosyaları yüklenecek)');
+    };
+
+    // Check if already logged in
+    if (auth.currentUser) {
+      // window.location.replace('dashboard.html');
+    }
   </script>
 </body>
 </html>

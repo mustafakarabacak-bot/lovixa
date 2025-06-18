@@ -1,0 +1,80 @@
+<!-- bottom-nav.html -->
+<nav class="bottom-nav">
+  <a href="index.html" id="nav-home"><i class="ph-map-pin-line-bold"></i></a>
+  <a href="explore.html" id="nav-explore"><i class="ph-compass-bold"></i></a>
+
+  <button id="plus-btn"><i class="ph-plus-bold"></i></button>
+
+  <a href="notifications.html" id="nav-heart"><i class="ph-heart-bold"></i></a>
+  <a href="profile.html" id="nav-me"><img id="nav-avatar" class="mini" src="https://via.placeholder.com/24" /></a>
+</nav>
+
+<div id="plus-menu" class="plus-popup">
+  <button id="story-btn">Hikâyene Ekle</button>
+  <button id="photo-btn">Fotoğraf Paylaş</button>
+</div>
+
+<style>
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background: #1e1e1e;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-top: 1px solid #333;
+    z-index: 999;
+  }
+  .bottom-nav a,
+  .bottom-nav button {
+    background: none;
+    border: 0;
+    color: #888;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  .bottom-nav .mini {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .bottom-nav .active {
+    color: #4caf50;
+  }
+  #plus-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #4caf50;
+    color: #fff;
+    font-size: 28px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: -24px;
+  }
+  .plus-popup {
+    position: fixed;
+    bottom: 72px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e1e1e;
+    padding: 12px 16px;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .plus-popup button {
+    background: #2a2a2a;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    padding: 8px 12px;
+  }
+</style>

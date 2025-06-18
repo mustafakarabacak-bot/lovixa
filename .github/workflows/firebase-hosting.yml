@@ -31,11 +31,3 @@ jobs:
       env:
         GOOGLE_APPLICATION_CREDENTIALS: $HOME/firebase.json
       run: firebase deploy --project=fresh-462110
-{
-  "type": "service_account",
-  "project_id": "fresh-462110",
-  "private_key_id": "xxxxxxx",
-  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvg...==\n-----END PRIVATE KEY-----\n",
-  "client_email": "firebase-adminsdk-abcde@fresh-462110.iam.gserviceaccount.com",
-  ...
-}

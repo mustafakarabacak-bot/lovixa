@@ -1,69 +1,252 @@
+<!-- loginregisterpage.html | Lovixa Unified Auth Page -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lovixa | Oturum Yönlendiriliyor</title>
+  <title>Lovixa | Giriş & Kayıt</title>
 
+  <!-- Simple reset & theme variables -->
   <style>
     :root {
       --bg: #0d0d0d;
+      --surface: #1e1e1e;
       --primary: #4caf50;
+      --accent: #4285f4;
       --text: #ffffff;
+      --radius: 16px;
+      --trans: all 0.2s ease;
+      --maxw: 480px;
     }
 
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background-color: var(--bg);
+      background: var(--bg);
       color: var(--text);
       font-family: "Segoe UI", sans-serif;
     }
 
-    .spinner {
-      margin-top: 20px;
-      width: 40px;
-      height: 40px;
-      border: 6px solid #333;
-      border-top: 6px solid var(--primary);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
+    h1 { margin: 0 0 1rem 0; font-size: 1.6rem; text-align: center; }
+
+    /* container card */
+    .card {
+      width: 100%;
+      max-width: var(--maxw);
+      background: var(--surface);
+      padding: 2rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: 0 2px 6px rgba(0,0,0,.4);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    label { display: flex; flex-direction: column; gap: .25rem; font-size: .9rem; }
+    input, select {
+      padding: .7rem 1rem;
+      border-radius: var(--radius);
+      border: 1px solid #333;
+      background: #2a2a2a;
+      color: var(--text);
+      font-size: .9rem;
     }
+    button {
+      padding: .8rem 1rem;
+      border: none;
+      border-radius: var(--radius);
+      background: var(--primary);
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--trans);
+    }
+    button:hover { opacity: .85; }
+
+    /* link row */
+    .links { display: flex; flex-wrap: wrap; gap: .5rem 1rem; justify-content: center; font-size: .8rem; margin-top: 2rem; }
+    .links a { color: var(--accent); text-decoration: none; }
+
+    /* tabs */
+    .tab-row { display: flex; justify-content: center; gap: .5rem; margin-bottom: 1rem; }
+    .tab-row button {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding: .5rem 1rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: var(--trans);
+    }
+    .tab-row button.active { border-color: var(--primary); }
+    .section { display: none; }
+    .section.show { display: flex; flex-direction: column; gap: 1rem; }
+
+    /* language */
+    .lang { position: absolute; top: .75rem; left: 50%; transform: translateX(-50%); font-size: .8rem; }
+    .lang select { background: transparent; color: var(--text); border: none; }
   </style>
 </head>
 <body>
-  <div>Oturum kontrol ediliyor...</div>
-  <div class="spinner"></div>
 
+  <!-- Language Switcher -->
+  <div class="lang">
+    <select id="lang">
+      <option value="tr" selected>TR</option>
+      <option value="en">EN</option>
+    </select>
+  </div>
+
+  <div class="card">
+    <h1>Lovixa</h1>
+
+    <!-- Tabs -->
+    <div class="tab-row">
+      <button id="login-tab" class="active">Giriş</button>
+      <button id="register-tab">Kayıt</button>
+      <button id="forgot-tab">Şifremi Unuttum</button>
+    </div>
+
+    <!-- Login Section -->
+    <div id="login-section" class="section show">
+      <label>Kullanıcı Adı veya E‑posta
+        <input id="login-id" type="text" required />
+      </label>
+      <label>Parola
+        <input id="login-pass" type="password" required />
+      </label>
+      <button id="login-btn">Giriş Yap</button>
+      <button id="google-btn" style="background: var(--accent);">Google ile Giriş</button>
+    </div>
+
+    <!-- Register Section -->
+    <div id="register-section" class="section">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <label>Ad
+          <input id="reg-first" type="text" required />
+        </label>
+        <label>Soyad
+          <input id="reg-last" type="text" required />
+        </label>
+      </div>
+      <label>Kullanıcı Adı
+        <input id="reg-username" type="text" required />
+      </label>
+      <label>Doğum Tarihi
+        <input id="reg-dob" type="date" required />
+      </label>
+      <label>E‑posta
+        <input id="reg-email" type="email" required />
+      </label>
+      <label>Telefon
+        <input id="reg-phone" type="tel" />
+      </label>
+      <label>Cinsiyet
+        <select id="reg-gender">
+          <option value="male">Erkek</option>
+          <option value="female">Kadın</option>
+          <option value="other">Diğer</option>
+        </select>
+      </label>
+      <label>Parola
+        <input id="reg-pass" type="password" required />
+      </label>
+      <label>Parola Tekrar
+        <input id="reg-pass2" type="password" required />
+      </label>
+      <label style="align-items:center;flex-direction:row;gap:.5rem;">
+        <input id="show-pass" type="checkbox" /> Parolayı Göster
+      </label>
+      <button id="register-btn">Kayıt Ol</button>
+    </div>
+
+    <!-- Forgot Section -->
+    <div id="forgot-section" class="section">
+      <label>Kayıtlı E‑posta Adresi
+        <input id="forgot-email" type="email" required />
+      </label>
+      <button id="forgot-btn">Sıfırlama E‑postası Gönder</button>
+    </div>
+
+    <!-- Footer Links -->
+    <div class="links">
+      <a href="terms.html" target="_blank">Kullanıcı Sözleşmesi</a>
+      <a href="faq.html" target="_blank">SSS</a>
+      <a href="about.html" target="_blank">Hakkımızda</a>
+    </div>
+  </div>
+
+  <!-- Firebase & Auth Logic -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { loginWithEmailOrUsername, loginWithGoogle, registerWithEmail, logout } from '../scripts/auth.js';
+    import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { app } from '../scripts/firebase.js';
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB2CadxMwGT9Li0P5aHGorGh07ZxYqx6_o",
-  authDomain: "fresh-462110.firebaseapp.com",
-  projectId: "fresh-462110",
-  storageBucket: "fresh-462110.appspot.com",
-  messagingSenderId: "1070639256758",
-  appId: "1:1070639256758:web:630db0f0134525e603c217",
-  measurementId: "G-SN6L5QJXNC"
-};
+    /* ui helpers */
+    const qs = (sel) => document.querySelector(sel);
+    const show = (id) => {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
+      qs(id).classList.add('show');
+      document.querySelectorAll('.tab-row button').forEach(b => b.classList.remove('active'));
+      const map = { '#login-section':'login-tab', '#register-section':'register-tab', '#forgot-section':'forgot-tab' };
+      qs('#'+map[id]).classList.add('active');
+    };
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    /* tab switching */
+    qs('#login-tab').onclick   = () => show('#login-section');
+    qs('#register-tab').onclick= () => show('#register-section');
+    qs('#forgot-tab').onclick = () => show('#forgot-section');
 
-    onAuthStateChanged(auth, (user) => {
-      const target = user ? "dashboard.html" : "loginregisterpage.html"; // loginregisterpage.html yerine login.html önerisi
-      window.location.replace(target);
-    });
+    /* show/hide password */
+    qs('#show-pass').onchange = (e) => {
+      const type = e.target.checked ? 'text' : 'password';
+      qs('#reg-pass').type = qs('#reg-pass2').type = type;
+    };
+
+    /* login */
+    qs('#login-btn').onclick = async () => {
+      try {
+        await loginWithEmailOrUsername(qs('#login-id').value, qs('#login-pass').value);
+        window.location.replace('dashboard.html');
+      } catch(err) { alert(err.message); }
+    };
+
+    /* google login */
+    qs('#google-btn').onclick = async () => {
+      try {
+        await loginWithGoogle();
+        window.location.replace('dashboard.html');
+      } catch(err) { alert(err.message); }
+    };
+
+    /* register */
+    qs('#register-btn').onclick = async () => {
+      const email = qs('#reg-email').value;
+      const pass  = qs('#reg-pass').value;
+      const pass2 = qs('#reg-pass2').value;
+      if(pass!==pass2) return alert('Parolalar eşleşmiyor');
+      try {
+        await registerWithEmail(email, pass);
+        alert('Kayıt başarıyla tamamlandı, şimdi giriş yapabilirsiniz');
+        show('#login-section');
+      } catch(err) { alert(err.message); }
+    };
+
+    /* forgot */
+    qs('#forgot-btn').onclick = async () => {
+      const email = qs('#forgot-email').value;
+      try {
+        const auth = getAuth(app);
+        await sendPasswordResetEmail(auth, email);
+        alert('Şifre sıfırlama e-postası gönderildi');
+        show('#login-section');
+      } catch(err) { alert(err.message); }
+    };
   </script>
 </body>
 </html>

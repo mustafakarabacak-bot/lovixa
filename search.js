@@ -1,49 +1,65 @@
-// search.js
-import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { app } from "./firebase.js";
-
-const db = getFirestore(app);
-const input = document.getElementById("search-input");
-const drop = document.getElementById("search-drop");
-
-input.addEventListener("input", async (e) => {
-  const term = e.target.value.trim().toLowerCase();
-  if (!term) return (drop.style.display = "none");
-
-  const q = query(
-    collection(db, "users"),
-    where("keywords", "array-contains", term) // arama için optimize field
-  );
-
-  const snapshot = await getDocs(q);
-  drop.innerHTML = "";
-
-  snapshot.forEach(doc => {
-    const user = doc.data();
-    const row = document.createElement("div");
-    row.className = "result-row";
-    row.innerHTML = `
-      <img src="${user.photoURL || 'https://via.placeholder.com/36'}">
-      <span>${user.name || 'Kullanıcı'}</span>
-      <button>Takip Et</button>
-    `;
-    row.onclick = () => location.href = `/profile.html?uid=${doc.id}`;
-    row.querySelector("button").onclick = ev => {
-      ev.stopPropagation();
-      alert(`Takip isteği: ${doc.id}`);
-    };
-    drop.appendChild(row);
-  });
-
-  drop.style.display = "block";
-});
-
-// dışa tıklanınca kapan
-window.addEventListener("click", (e) => {
-  if (!input.contains(e.target) && !drop.contains(e.target)) {
-    drop.style.display = "none";
+document.addEventListener('DOMContentLoaded', () => {
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', handleSearch);
   }
 });
 
-// avatar & mesaj tıklama
-document.getElementById("msg-btn").onclick = () => location.href = "/messages.html";
+async function handleSearch(e) {
+  const query = e.target.value.trim().toLowerCase();
+  const resultsContainer = document.getElementById('search-results');
+  resultsContainer.innerHTML = '';
+  
+  if (query.length < 2) {
+    resultsContainer.style.display = 'none';
+    return;
+  }
+  
+  const usersRef = firebase.firestore().collection('users');
+  const snapshot = await usersRef
+    .where('keywords', 'array-contains', query)
+    .limit(5)
+    .get();
+  
+  if (snapshot.empty) {
+    resultsContainer.innerHTML = '<div class="result-item">Sonuç bulunamadı</div>';
+    resultsContainer.style.display = 'block';
+    return;
+  }
+  
+  snapshot.forEach(doc => {
+    const user = doc.data();
+    const resultItem = document.createElement('div');
+    resultItem.className = 'result-item';
+    resultItem.innerHTML = `
+      <img src="${user.photoURL || 'default-avatar.png'}" class="avatar">
+      <span>${user.displayName}</span>
+      <button class="follow-btn" data-uid="${user.uid}">Takip Et</button>
+    `;
+    resultItem.addEventListener('click', () => {
+      window.location.href = `/profile.html?uid=${user.uid}`;
+    });
+    resultsContainer.appendChild(resultItem);
+  });
+  
+  resultsContainer.style.display = 'block';
+  
+  // Takip butonları için event listener
+  document.querySelectorAll('.follow-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const uid = btn.dataset.uid;
+      toggleFollow(uid);
+    });
+  });
+}
+
+function toggleFollow(uid) {
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+  
+  const userRef = firebase.firestore().collection('users').doc(user.uid);
+  userRef.update({
+    following: firebase.firestore.FieldValue.arrayUnion(uid)
+  });
+}

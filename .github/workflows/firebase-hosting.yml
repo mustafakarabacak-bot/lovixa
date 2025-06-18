@@ -1,4 +1,4 @@
-name: Firebase Hosting Deploy
+name: Deploy to Firebase Hosting
 
 on:
   push:
@@ -8,20 +8,25 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout source
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '18'
+
+      - name: Decode Firebase Service Account
+        run: |
+          echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_B64 }}" | base64 -d > ${{ github.workspace }}/firebase-key.json
 
       - name: Install Firebase CLI
         run: npm install -g firebase-tools
 
-      - name: Decode Firebase service account
-        run: echo "${{ secrets.FIREBASE_SERVICE_ACCOUNT_B64 }}" | base64 -d > $HOME/firebase.json
-
       - name: Deploy to Firebase
-        run: firebase deploy --project=fresh-462110 --token "$(firebase login:ci --no-localhost --json < $HOME/firebase.json)"
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ github.workspace }}/firebase-key.json
+        run: |
+          firebase deploy --project=fresh-462110

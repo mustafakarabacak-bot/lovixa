@@ -2,30 +2,38 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="5" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lovixa | Yönlendiriliyor...</title>
+  <title>Lovixa | Oturum Yönlendiriliyor</title>
+
   <style>
+    :root {
+      --bg: #0d0d0d;
+      --primary: #4caf50;
+      --text: #ffffff;
+    }
+
     body {
       margin: 0;
       height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      background-color: #0d0d0d;
-      color: #ffffff;
+      background-color: var(--bg);
+      color: var(--text);
       font-family: "Segoe UI", sans-serif;
-      flex-direction: column;
     }
+
     .spinner {
       margin-top: 20px;
-      border: 6px solid #333;
-      border-top: 6px solid #4caf50;
-      border-radius: 50%;
       width: 40px;
       height: 40px;
+      border: 6px solid #333;
+      border-top: 6px solid var(--primary);
+      border-radius: 50%;
       animation: spin 1s linear infinite;
     }
+
     @keyframes spin {
       to { transform: rotate(360deg); }
     }
@@ -35,32 +43,26 @@
   <div>Oturum kontrol ediliyor...</div>
   <div class="spinner"></div>
 
-  <!-- Firebase Yönlendirme Kontrolü -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
     const firebaseConfig = {
-  apiKey:            "AIzaSyB2CadxMwGT9L10P5aHGorGh07ZxYqx6_o",
-  authDomain:        "fresh-462110.firebaseapp.com",
-  projectId:         "fresh-462110",
-  storageBucket:     "fresh-462110.appspot.com",
-  messagingSenderId: "1070639256758",
-  appId:             "1:1070639256758:web:630db0f0134525e603c217",
-  measurementId:     "G-W5CLG9SJXC"
-};
+      apiKey: "AIzaSyB2CadxMwGT9Li0P5aHGorGh07ZxYqx6_o",
+      authDomain: "fresh-462110.firebaseapp.com",
+      projectId: "fresh-462110",
+      storageBucket: "fresh-462110.appspot.com",
+      messagingSenderId: "1070639256758",
+      appId: "1:1070639256758:web:630db0f0134525e603c217",
+      measurementId: "G-SN6L5QJXNC"
+    };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // Kullanıcı giriş yaptıysa dashboard sayfasına yönlendir
-        window.location.href = "dashboard.html";
-      } else {
-        // Giriş yapılmamışsa login-register sayfasına yönlendir
-        window.location.href = "loginregisterpage.html";
-      }
+      const target = user ? "dashboard.html" : "login.html"; // loginregisterpage.html yerine login.html önerisi
+      window.location.replace(target);
     });
   </script>
 </body>

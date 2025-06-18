@@ -1,13 +1,22 @@
 // ui-loader.js
-(async () => {
-  const top = await fetch("/topbar.html").then(r => r.text());
-  const bot = await fetch("/bottom-nav.html").then(r => r.text());
+async function loadComponent(url) {
+  const res = await fetch(url);
+  const html = await res.text();
+  const container = document.createElement("div");
+  container.innerHTML = html;
+  document.body.insertAdjacentElement("afterbegin", container);
+}
 
-  const topDiv = document.createElement("div");
-  topDiv.innerHTML = top;
-  document.body.prepend(topDiv);
+// Üst menü (topbar)
+loadComponent("./topbar.html").then(() => {
+  const spacer = document.createElement("div");
+  spacer.style.height = "56px";
+  document.body.insertBefore(spacer, document.body.firstChild.nextSibling);
+});
 
-  const botDiv = document.createElement("div");
-  botDiv.innerHTML = bot;
-  document.body.appendChild(botDiv);
-})();
+// Alt menü (bottom nav)
+loadComponent("./bottom-nav.html").then(() => {
+  const spacer = document.createElement("div");
+  spacer.style.height = "56px";
+  document.body.appendChild(spacer);
+});

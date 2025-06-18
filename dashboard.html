@@ -1,62 +1,35 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Konum Paylaşım</title>
-  
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-  
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>Lovixa | Dashboard</title>
+
+  <!-- Karanlık arka plan ve tam-ekran harita için temel stil -->
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-    
-    body {
-      overflow: hidden;
-      height: 100vh;
-    }
-    
-    #map {
-      position: absolute;
-      top: 56px;
-      bottom: 56px;
-      width: 100%;
-      z-index: 1;
-    }
-    
-    .avatar {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px solid white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    :root { --top-h:56px; --bot-h:56px; --bg:#0d0d0d; }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:"Segoe UI",sans-serif;}
+    body{background:var(--bg);height:100vh;overflow:hidden;}
+    #map{
+      position:fixed;
+      top:var(--top-h);
+      bottom:var(--bot-h);
+      left:0;
+      right:0;
+      z-index:0;        /* bar’ların altında kalır */
     }
   </style>
 </head>
+
 <body>
-  <!-- Üst ve alt menüler UI Loader tarafından eklenecek -->
-  <div id="topbar-container"></div>
+  <!-- Üst ve Alt bar kapsayıcıları – layoutUI.js bunları doldurur -->
+  <div id="topbar"></div>
   <div id="map"></div>
-  <div id="bottom-nav-container"></div>
-  
-  <!-- Firebase & Leaflet -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-  
-  <!-- Uygulama Scriptleri -->
-  <script src="firebase.js"></script>
-  <script src="auth.js"></script>
-  <script src="ui-loader.js"></script>
-  <script src="ui-events.js"></script>
-  <script src="map.js"></script>
-  <script src="search.js"></script>
+  <div id="bottombar"></div>
+
+  <!-- Modüler UI katmanları -->
+  <script type="module" src="layoutUI.js"></script>
+  <script type="module" src="searchUsers.js"></script>
+  <script type="module" src="map.js"></script>
 </body>
 </html>

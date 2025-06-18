@@ -8,16 +8,10 @@
   <!-- ======= KURUMSAL TEMA ======= -->
   <style>
     :root {
-      --bg: #0d0d0d;
-      --surface: #1e1e1e;
-      --primary: #4caf50;
-      --accent: #4285f4;
-      --text: #ffffff;
-      --radius: 14px;
-      --transition: all 0.2s ease;
-      --card-w: clamp(320px, 90vw, 420px);
+      --bg:#0d0d0d; --surface:#1e1e1e; --primary:#4caf50; --accent:#4285f4;
+      --text:#ffffff; --radius:14px; --transition:.2s ease; --card-w:clamp(320px,90vw,420px);
     }
-    * {box-sizing: border-box;font-family: "Segoe UI", sans-serif;margin:0;padding:0;}
+    *{box-sizing:border-box;font-family:"Segoe UI",sans-serif;margin:0;padding:0}
     body{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;background:var(--bg);color:var(--text);}
     header{position:absolute;top:16px;width:100%;display:flex;justify-content:center;pointer-events:none;}
     header select{pointer-events:auto;background:var(--surface);color:var(--text);border:none;padding:6px 10px;border-radius:var(--radius);cursor:pointer;}
@@ -28,7 +22,7 @@
     .row.inline{flex-direction:row;gap:12px;}
     .row.inline .col{flex:1;}
     label{font-size:.85rem;margin-bottom:4px;}
-    input, select{width:100%;padding:10px;border-radius:var(--radius);border:1px solid #444;background:#2a2a2a;color:var(--text);transition:var(--transition);}
+    input,select{width:100%;padding:10px;border-radius:var(--radius);border:1px solid #444;background:#2a2a2a;color:var(--text);transition:var(--transition);}
     input:focus,select:focus{outline:none;border-color:var(--primary);}
     button{width:100%;padding:12px;margin-top:8px;border:none;border-radius:var(--radius);background:var(--primary);color:#fff;font-weight:600;cursor:pointer;transition:var(--transition);}
     button:hover{background:#42a045;}
@@ -38,6 +32,9 @@
     footer a{color:#aaa;text-decoration:none;margin:0 6px;}
     footer a:hover{text-decoration:underline;}
     .hidden{display:none;}
+    /* Google butonu */
+    #googleBtn{background:#fff;color:#000;font-weight:500;display:flex;align-items:center;justify-content:center;gap:8px;}
+    #googleBtn:hover{background:#e9e9e9;}
   </style>
 </head>
 <body>
@@ -47,7 +44,6 @@
       <option value="tr">Türkçe (TR)</option>
       <option value="en">English (EN)</option>
       <option value="de">Deutsch (DE)</option>
-      <!-- Gerektiği kadar ek dil -->
     </select>
   </header>
 
@@ -65,6 +61,7 @@
         <input type="password" id="loginPassword" autocomplete="current-password" required />
       </div>
       <button id="loginBtn">Giriş Yap</button>
+      <button id="googleBtn"><span>🔎</span> Google ile Devam Et</button>
       <button class="link-btn" id="forgotLink">Şifremi Unuttum</button>
       <button class="link-btn" id="toggleToRegister">Üye değil misin? Kayıt ol →</button>
     </section>
@@ -72,48 +69,23 @@
     <!-- Kayıt Formu -->
     <section id="registerCard" class="card hidden">
       <h1>Kayıt Ol</h1>
-      <div class="row">
-        <label for="regUsername">Kullanıcı Adı</label>
-        <input type="text" id="regUsername" required />
-      </div>
+      <div class="row"><label for="regUsername">Kullanıcı Adı</label><input type="text" id="regUsername" required /></div>
       <div class="row inline">
-        <div class="col">
-          <label for="regFirst">İsim</label>
-          <input type="text" id="regFirst" required />
-        </div>
-        <div class="col">
-          <label for="regLast">Soy İsim</label>
-          <input type="text" id="regLast" required />
-        </div>
+        <div class="col"><label for="regFirst">İsim</label><input type="text" id="regFirst" required /></div>
+        <div class="col"><label for="regLast">Soy İsim</label><input type="text" id="regLast" required /></div>
       </div>
-      <div class="row">
-        <label for="regEmail">E-posta</label>
-        <input type="email" id="regEmail" autocomplete="email" required />
-      </div>
-      <div class="row">
-        <label for="regPhone">Telefon</label>
-        <input type="tel" id="regPhone" placeholder="+90 5xx xxx xx xx" required />
-      </div>
+      <div class="row"><label for="regEmail">E-posta</label><input type="email" id="regEmail" autocomplete="email" required /></div>
+      <div class="row"><label for="regPhone">Telefon</label><input type="tel" id="regPhone" placeholder="+90 5xx xxx xx xx" required /></div>
       <div class="row inline">
-        <div class="col">
-          <label for="regBirth">Doğum Tarihi</label>
-          <input type="date" id="regBirth" required />
-        </div>
-        <div class="col">
-          <label for="regGender">Cinsiyet</label>
+        <div class="col"><label for="regBirth">Doğum Tarihi</label><input type="date" id="regBirth" required /></div>
+        <div class="col"><label for="regGender">Cinsiyet</label>
           <select id="regGender" required>
             <option value="" disabled selected>Seçiniz</option>
-            <option value="female">Kadın</option>
-            <option value="male">Erkek</option>
-            <option value="other">Diğer</option>
-            <option value="prefer_not">Belirtmek İstemiyorum</option>
-          </select>
-        </div>
+            <option value="female">Kadın</option><option value="male">Erkek</option>
+            <option value="other">Diğer</option><option value="prefer_not">Belirtmek İstemiyorum</option>
+          </select></div>
       </div>
-      <div class="row">
-        <label for="regPassword">Şifre</label>
-        <input type="password" id="regPassword" autocomplete="new-password" required />
-      </div>
+      <div class="row"><label for="regPassword">Şifre</label><input type="password" id="regPassword" autocomplete="new-password" required /></div>
       <button id="registerBtn">Kaydol</button>
       <button class="link-btn" id="toggleToLogin">Hesabın var mı? Giriş yap →</button>
     </section>
@@ -121,10 +93,7 @@
     <!-- Şifre Sıfırlama Formu -->
     <section id="resetCard" class="card hidden">
       <h1>Şifre Sıfırla</h1>
-      <div class="row">
-        <label for="resetEmail">E-posta</label>
-        <input type="email" id="resetEmail" required />
-      </div>
+      <div class="row"><label for="resetEmail">E-posta</label><input type="email" id="resetEmail" required /></div>
       <button id="resetBtn">Sıfırla</button>
       <button class="link-btn" id="backToLogin">← Girişe Dön</button>
     </section>
@@ -132,97 +101,102 @@
 
   <!-- ========== Alt Bilgi ========== -->
   <footer>
-    <a href="#">Kullanıcı Sözleşmesi</a> •
-    <a href="#">SSS</a> •
-    <a href="#">Hakkımızda</a>
+    <a href="terms.html">Kullanıcı Sözleşmesi</a> •
+    <a href="faq.html">SSS</a> •
+    <a href="about.html">Hakkımızda</a>
   </footer>
 
   <!-- ========== Firebase + Kimlik Doğrulama Scripti ========== -->
   <script type="module">
-    /*************************
-     *  Firebase Konfigürasyon
-     *************************/
+    /*************** Firebase Konfig ***************/
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
     import {
-      getAuth,
-      setPersistence,
-      browserLocalPersistence,
-      createUserWithEmailAndPassword,
-      sendPasswordResetEmail,
-      signInWithEmailAndPassword,
-      GoogleAuthProvider,
-      signInWithPopup
+      getAuth, setPersistence, browserLocalPersistence,
+      createUserWithEmailAndPassword, signInWithEmailAndPassword,
+      sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup
     } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import {
+      getFirestore, doc, setDoc
+    } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-    // ——— Değiştirmeyin: Önceden onaylı yapılandırma ———
     const firebaseConfig = {
-  apiKey:            "AIzaSyB2CadxMwGT9L10P5aHGorGh07ZxYqx6_o",
-  authDomain:        "fresh-462110.firebaseapp.com",
-  projectId:         "fresh-462110",
-  storageBucket:     "fresh-462110.appspot.com",
-  messagingSenderId: "1070639256758",
-  appId:             "1:1070639256758:web:630db0f0134525e603c217",
-  measurementId:     "G-W5CLG9SJXC"
-};
+      apiKey: "AIzaSyB2CadxMwGT9L10P5aHGorGh07ZxYqx6_o",
+      authDomain: "fresh-462110.firebaseapp.com",
+      projectId: "fresh-462110",
+      storageBucket: "fresh-462110.appspot.com",
+      messagingSenderId: "1070639256758",
+      appId: "1:1070639256758:web:630db0f0134525e603c217",
+      measurementId: "G-W5CLG9SJXC"
+    };
 
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    setPersistence(auth, browserLocalPersistence);
+    const db   = getFirestore(app);
+    await setPersistence(auth, browserLocalPersistence);
 
-    // ========== UI Yardımcı Fonksiyonlar ==========
-    const loginCard     = document.getElementById("loginCard");
-    const registerCard  = document.getElementById("registerCard");
-    const resetCard     = document.getElementById("resetCard");
-    const show = (el) => el.classList.remove("hidden");
-    const hide = (el) => el.classList.add("hidden");
+    /*************** UI Yardımcıları ***************/
+    const loginCard = document.getElementById("loginCard");
+    const registerCard = document.getElementById("registerCard");
+    const resetCard = document.getElementById("resetCard");
+    const show = el => el.classList.remove("hidden");
+    const hide = el => el.classList.add("hidden");
 
-    // —— Toggle eventleri
+    /* Kart geçişleri */
     document.getElementById("toggleToRegister").onclick = () => { hide(loginCard); show(registerCard); };
     document.getElementById("toggleToLogin").onclick    = () => { hide(registerCard); show(loginCard); };
     document.getElementById("forgotLink").onclick       = () => { hide(loginCard); show(resetCard); };
     document.getElementById("backToLogin").onclick      = () => { hide(resetCard); show(loginCard); };
 
-    // —— Giriş
+    /* === Giriş (E-posta/Şifre) === */
     document.getElementById("loginBtn").onclick = async () => {
-      const email = document.getElementById("loginEmail").value.trim();
-      const pass  = document.getElementById("loginPassword").value.trim();
+      const email = loginEmail.value.trim();
+      const pass  = loginPassword.value.trim();
       try {
         await signInWithEmailAndPassword(auth, email, pass);
-        alert("Hoş geldin! Oturum açıldı.");
-        // → Dashboard yönlendirme burada yapılır
+        location.href = "dashboard.html";
       } catch (err) { alert(err.message); }
     };
 
-    // —— Kayıt
-    document.getElementById("registerBtn").onclick = async () => {
-      const email = document.getElementById("regEmail").value.trim();
-      const pass  = document.getElementById("regPassword").value.trim();
+    /* === Google ile Giriş/Kayıt === */
+    const provider = new GoogleAuthProvider();
+    googleBtn.onclick = async () => {
       try {
-        await createUserWithEmailAndPassword(auth, email, pass);
-        alert("Kayıt tamamlandı. Oturum açıldı.");
-        // → Profil verilerini Firestore’a kaydetme vb.
+        await signInWithPopup(auth, provider);
+        location.href = "dashboard.html";
       } catch (err) { alert(err.message); }
     };
 
-    // —— Şifre Sıfırlama
-    document.getElementById("resetBtn").onclick = async () => {
-      const email = document.getElementById("resetEmail").value.trim();
+    /* === Kayıt (E-posta/Şifre + Profil Yazımı) === */
+    registerBtn.onclick = async () => {
+      const email = regEmail.value.trim();
+      const pass  = regPassword.value.trim();
       try {
-        await sendPasswordResetEmail(auth, email);
+        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+        /* Firestore profil detayı */
+        await setDoc(doc(db, "users", cred.user.uid), {
+          username : regUsername.value.trim(),
+          name     : regFirst.value.trim(),
+          surname  : regLast.value.trim(),
+          phone    : regPhone.value.trim(),
+          birth    : regBirth.value,
+          gender   : regGender.value,
+          email
+        });
+        location.href = "dashboard.html";
+      } catch (err) { alert(err.message); }
+    };
+
+    /* === Şifre Sıfırla === */
+    resetBtn.onclick = async () => {
+      try {
+        await sendPasswordResetEmail(auth, resetEmail.value.trim());
         alert("Şifre sıfırlama bağlantısı gönderildi.");
       } catch (err) { alert(err.message); }
     };
 
-    // —— (Opsiyonel) Google ile Giriş
-    const provider = new GoogleAuthProvider();
-    // signInWithPopup(auth, provider);
+    /* Dil seçici placeholder */
+    langSwitcher.onchange = e => alert(`Dil "${e.target.value}" olarak ayarlandı. (i18n entegre edilecek)`);
 
-    // Dil seçici (placeholder; i18n entegrasyonu için hook noktası)
-    document.getElementById("langSwitcher").onchange = (e) => {
-      const lang = e.target.value;
-      alert(`Dil "${lang}" olarak ayarlandı. (Çeviri modülü entegre edilecek)`);
-      // → i18next, Polyglot ya da Firebase Remote Config ile dinamik çeviri yapılabilir
-    };
   </script>
 </body>
 </html>

@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lovixa | Giriş & Kayıt</title>
-
   <style>
     :root {
       --bg: #0d0d0d;
@@ -16,7 +15,6 @@
       --trans: all 0.2s ease;
       --maxw: 480px;
     }
-
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -29,9 +27,7 @@
       color: var(--text);
       font-family: "Segoe UI", sans-serif;
     }
-
     h1 { margin: 0 0 1rem 0; font-size: 1.6rem; text-align: center; }
-
     .card {
       width: 100%;
       max-width: var(--maxw);
@@ -43,7 +39,6 @@
       flex-direction: column;
       gap: 1rem;
     }
-
     label { display: flex; flex-direction: column; gap: .25rem; font-size: .9rem; }
     input, select {
       padding: .7rem 1rem;
@@ -64,10 +59,8 @@
       transition: var(--trans);
     }
     button:hover { opacity: .85; }
-
     .links { display: flex; flex-wrap: wrap; gap: .5rem 1rem; justify-content: center; font-size: .8rem; margin-top: 2rem; }
     .links a { color: var(--accent); text-decoration: none; }
-
     .tab-row { display: flex; justify-content: center; gap: .5rem; margin-bottom: 1rem; }
     .tab-row button {
       background: transparent;
@@ -81,203 +74,130 @@
     .tab-row button.active { border-color: var(--primary); }
     .section { display: none; }
     .section.show { display: flex; flex-direction: column; gap: 1rem; }
-
     .lang { position: absolute; top: .75rem; left: 50%; transform: translateX(-50%); font-size: .8rem; }
     .lang select { background: transparent; color: var(--text); border: none; }
   </style>
 </head>
 <body>
-
   <div class="lang">
     <select id="lang">
       <option value="tr" selected>TR</option>
       <option value="en">EN</option>
     </select>
   </div>
-
   <div class="card">
     <h1>Lovixa</h1>
-
     <div class="tab-row">
       <button id="login-tab" class="active">Giriş</button>
       <button id="register-tab">Kayıt</button>
       <button id="forgot-tab">Şifremi Unuttum</button>
     </div>
-
     <div id="login-section" class="section show">
-      <label>Kullanıcı Adı veya E‑posta
-        <input id="login-id" type="text" required />
-      </label>
-      <label>Parola
-        <input id="login-pass" type="password" required />
-      </label>
+      <label>Kullanıcı Adı veya E‑posta<input id="login-id" type="text" required /></label>
+      <label>Parola<input id="login-pass" type="password" required /></label>
       <button id="login-btn">Giriş Yap</button>
       <button id="google-btn" style="background: var(--accent);">Google ile Giriş</button>
     </div>
-
     <div id="register-section" class="section">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-        <label>Ad
-          <input id="reg-first" type="text" required />
-        </label>
-        <label>Soyad
-          <input id="reg-last" type="text" required />
-        </label>
+        <label>Ad<input id="reg-first" type="text" required /></label>
+        <label>Soyad<input id="reg-last" type="text" required /></label>
       </div>
-      <label>Kullanıcı Adı
-        <input id="reg-username" type="text" required />
-      </label>
-      <label>Doğum Tarihi
-        <input id="reg-dob" type="date" required />
-      </label>
-      <label>E‑posta
-        <input id="reg-email" type="email" required />
-      </label>
-      <label>Telefon
-        <input id="reg-phone" type="tel" />
-      </label>
-      <label>Cinsiyet
-        <select id="reg-gender">
-          <option value="male">Erkek</option>
-          <option value="female">Kadın</option>
-          <option value="other">Diğer</option>
-        </select>
-      </label>
-      <label>Parola
-        <input id="reg-pass" type="password" required />
-      </label>
-      <label>Parola Tekrar
-        <input id="reg-pass2" type="password" required />
-      </label>
+      <label>Kullanıcı Adı<input id="reg-username" type="text" required /></label>
+      <label>Doğum Tarihi<input id="reg-dob" type="date" required /></label>
+      <label>E‑posta<input id="reg-email" type="email" required /></label>
+      <label>Telefon<input id="reg-phone" type="tel" /></label>
+      <label>Cinsiyet<select id="reg-gender">
+        <option value="male">Erkek</option>
+        <option value="female">Kadın</option>
+        <option value="other">Diğer</option>
+      </select></label>
+      <label>Parola<input id="reg-pass" type="password" required /></label>
+      <label>Parola Tekrar<input id="reg-pass2" type="password" required /></label>
       <label style="align-items:center;flex-direction:row;gap:.5rem;">
         <input id="show-pass" type="checkbox" /> Parolayı Göster
       </label>
       <button id="register-btn">Kayıt Ol</button>
     </div>
-
     <div id="forgot-section" class="section">
-      <label>Kayıtlı E‑posta Adresi
-        <input id="forgot-email" type="email" required />
-      </label>
-      <button id="forgot-btn">Sıfırlama E‑postası Gönder</button>
+      <label>Kayıtlı E‑posta Adresi<input id="forgot-email" type="email" required /></label>
+      <button id="forgot-btn">Şıfre Sıfırlama E‑postası Gönder</button>
     </div>
-
     <div class="links">
       <a href="terms.html" target="_blank">Kullanıcı Sözleşmesi</a>
       <a href="faq.html" target="_blank">SSS</a>
       <a href="about.html" target="_blank">Hakkımızda</a>
     </div>
   </div>
+  <script type="module">
+    import { loginWithEmailOrUsername, loginWithGoogle, registerWithEmail } from '../scripts/auth.js';
+    import { getAuth, sendPasswordResetEmail, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+    import { app } from '../scripts/firebase.js';
 
-  <script>
-    // Firebase simülasyonu (gerçek uygulamada firebase.js ve auth.js import edilmeli)
-    const auth = {
-      currentUser: null,
-      async signInWithEmailAndPassword(email, password) {
-        console.log('Giriş denemesi:', email, password);
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            this.currentUser = { email };
-            resolve({ user: this.currentUser });
-          }, 1000);
-        });
-      },
-      async createUserWithEmailAndPassword(email, password) {
-        console.log('Kayıt denemesi:', email, password);
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            this.currentUser = { email };
-            resolve({ user: this.currentUser });
-          }, 1000);
-        });
-      },
-      async sendPasswordResetEmail(email) {
-        console.log('Şifre sıfırlama e-postası gönderildi:', email);
-        return new Promise((resolve) => {
-          setTimeout(() => resolve(), 1000);
-        });
-      }
-    };
-
-    // UI Helpers
-    const qs = (sel) => document.querySelector(sel);
-    const show = (id) => {
+    const auth = getAuth(app);
+    const qs = sel => document.querySelector(sel);
+    const show = id => {
       document.querySelectorAll('.section').forEach(s => s.classList.remove('show'));
       qs(id).classList.add('show');
       document.querySelectorAll('.tab-row button').forEach(b => b.classList.remove('active'));
-      const map = { 
-        '#login-section':'login-tab', 
-        '#register-section':'register-tab', 
-        '#forgot-section':'forgot-tab' 
-      };
+      const map = { '#login-section':'login-tab', '#register-section':'register-tab', '#forgot-section':'forgot-tab' };
       qs('#'+map[id]).classList.add('active');
     };
 
-    // Tab switching
     qs('#login-tab').onclick = () => show('#login-section');
     qs('#register-tab').onclick = () => show('#register-section');
     qs('#forgot-tab').onclick = () => show('#forgot-section');
 
-    // Show password toggle
-    qs('#show-pass').onchange = (e) => {
+    qs('#show-pass').onchange = e => {
       const type = e.target.checked ? 'text' : 'password';
-      qs('#reg-pass').type = type;
-      qs('#reg-pass2').type = type;
+      qs('#reg-pass').type = qs('#reg-pass2').type = type;
     };
 
-    // Auth functions
     qs('#login-btn').onclick = async () => {
       try {
-        await auth.signInWithEmailAndPassword(qs('#login-id').value, qs('#login-pass').value);
-        alert('Giriş başarılı! Dashboarda yönlendiriliyorsunuz...');
-        // window.location.replace('dashboard.html');
+        await loginWithEmailOrUsername(qs('#login-id').value, qs('#login-pass').value);
+        window.location.replace('dashboard.html');
       } catch (err) {
-        alert('Giriş başarısız: ' + err.message);
+        alert('Giriş hatası: ' + err.message);
       }
     };
 
     qs('#google-btn').onclick = async () => {
       try {
-        alert('Google ile giriş simülasyonu (gerçek uygulamada Firebase Auth kullanılacak)');
-        // window.location.replace('dashboard.html');
+        await loginWithGoogle();
+        window.location.replace('dashboard.html');
       } catch (err) {
-        alert('Google ile giriş başarısız: ' + err.message);
+        alert('Google giriş hatası: ' + err.message);
       }
     };
 
     qs('#register-btn').onclick = async () => {
-      if (qs('#reg-pass').value !== qs('#reg-pass2').value) {
-        return alert('Parolalar eşleşmiyor!');
-      }
+      const email = qs('#reg-email').value;
+      const pass = qs('#reg-pass').value;
+      const pass2 = qs('#reg-pass2').value;
+      if (pass !== pass2) return alert('Parolalar uyuşmuyor');
       try {
-        await auth.createUserWithEmailAndPassword(qs('#reg-email').value, qs('#reg-pass').value);
-        alert('Kayıt başarılı! Giriş sayfasına yönlendiriliyorsunuz...');
-        show('#login-section');
-        // window.location.replace('dashboard.html');
+        await registerWithEmail(email, pass);
+        await signInWithEmailAndPassword(auth, email, pass);
+        window.location.replace('dashboard.html');
       } catch (err) {
-        alert('Kayıt başarısız: ' + err.message);
+        alert('Kayıt hatası: ' + err.message);
       }
     };
 
     qs('#forgot-btn').onclick = async () => {
       try {
-        await auth.sendPasswordResetEmail(qs('#forgot-email').value);
-        alert('Şifre sıfırlama e-postası gönderildi!');
+        await sendPasswordResetEmail(auth, qs('#forgot-email').value);
+        alert('E‑posta gönderildi');
         show('#login-section');
       } catch (err) {
-        alert('Hata oluştu: ' + err.message);
+        alert('Hata: ' + err.message);
       }
     };
 
-    // Language switcher
-    qs('#lang').onchange = (e) => {
-      alert('Dil değiştirildi: ' + e.target.value + '\n(Gerçek uygulamada dil dosyaları yüklenecek)');
+    qs('#lang').onchange = e => {
+      alert('Dil seçimi: ' + e.target.value + ' (Simüle edilmiş)');
     };
-
-    // Check if already logged in
-    if (auth.currentUser) {
-      // window.location.replace('dashboard.html');
-    }
   </script>
 </body>
 </html>

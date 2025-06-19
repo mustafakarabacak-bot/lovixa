@@ -1,10 +1,11 @@
-<!-- /pages/dashboard.html -->
 <!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lovixa | Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -12,52 +13,523 @@
       --surface: #1e1e1e;
       --primary: #4caf50;
       --accent: #4285f4;
+      --accent-light: #5e9bff;
       --text: #ffffff;
+      --text-secondary: #b0b0b0;
       --radius: 16px;
-      --trans: all 0.2s ease;
-      --top-h: 56px;
-      --bot-h: 56px;
+      --radius-sm: 8px;
+      --trans: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      --top-h: 64px;
+      --bot-h: 72px;
+      --glass: rgba(30, 30, 30, 0.7);
+      --glass-border: rgba(255, 255, 255, 0.08);
     }
 
-    * { box-sizing: border-box; }
-    body {
+    * { 
+      box-sizing: border-box;
       margin: 0;
+      padding: 0;
+    }
+    
+    body {
       background: var(--bg);
       color: var(--text);
-      font-family: "Segoe UI", sans-serif;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
       height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      position: relative;
     }
 
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 10% 20%, rgba(30, 46, 80, 0.15) 0%, rgba(0, 0, 0, 0) 50%),
+                  radial-gradient(circle at 90% 80%, rgba(76, 175, 80, 0.08) 0%, rgba(0, 0, 0, 0) 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* Top Bar Styling */
+    #topbar-placeholder {
+      position: relative;
+      z-index: 100;
+    }
+
+    .topbar {
+      height: var(--top-h);
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo-icon {
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .search-container {
+      flex: 1;
+      max-width: 600px;
+      margin: 0 20px;
+      position: relative;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 12px 20px 12px 48px;
+      background: rgba(20, 20, 20, 0.6);
+      border: 1px solid var(--glass-border);
+      border-radius: 50px;
+      color: var(--text);
+      font-size: 0.95rem;
+      transition: var(--trans);
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-secondary);
+    }
+
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(20, 20, 20, 0.6);
+      border: 1px solid var(--glass-border);
+      color: var(--text);
+      cursor: pointer;
+      transition: var(--trans);
+    }
+
+    .icon-btn:hover {
+      background: rgba(30, 30, 30, 0.8);
+      transform: translateY(-2px);
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-light));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Map Container */
     #map {
       flex: 1;
       width: 100%;
+      position: relative;
+    }
+
+    .map-overlay {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .map-control {
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--trans);
+    }
+
+    .map-control:hover {
+      background: rgba(40, 40, 40, 0.7);
+      transform: translateY(-2px);
+    }
+
+    /* Bottom Navigation */
+    #bottom-nav-placeholder {
+      position: relative;
+      z-index: 100;
+    }
+
+    .bottom-nav {
+      height: var(--bot-h);
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      border-radius: var(--radius-sm);
+      padding: 8px 0;
+      color: var(--text-secondary);
+      transition: var(--trans);
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--accent);
+      transform: translateY(-5px);
+    }
+
+    .nav-item i {
+      font-size: 1.4rem;
+      margin-bottom: 4px;
+    }
+
+    .nav-item span {
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    .nav-item:hover:not(.active) {
+      color: var(--text);
+      background: rgba(30, 30, 30, 0.4);
+    }
+
+    /* Stats Panel */
+    .stats-panel {
+      position: absolute;
+      bottom: 90px;
+      left: 20px;
+      z-index: 10;
+      background: var(--glass);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      width: 280px;
+      transform: translateY(0);
+      transition: var(--trans);
+    }
+
+    .stats-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .stats-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: rgba(20, 20, 20, 0.4);
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      transition: var(--trans);
+    }
+
+    .stat-card:hover {
+      background: rgba(30, 30, 30, 0.6);
+      transform: translateY(-3px);
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+      background: linear-gradient(to right, var(--text), var(--accent-light));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .search-container {
+        margin: 0 10px;
+      }
+      
+      .logo-text {
+        display: none;
+      }
+      
+      .stats-panel {
+        width: 240px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .user-actions .icon-btn:not(:last-child),
+      .user-actions .icon-btn:nth-child(2) {
+        display: none;
+      }
+      
+      .stats-panel {
+        width: 200px;
+        left: 10px;
+        bottom: 85px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <div id="topbar-placeholder"></div>
-  <div id="map"></div>
-  <div id="bottom-nav-placeholder"></div>
+  <div id="topbar-placeholder">
+    <div class="topbar">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-location-dot"></i>
+        </div>
+        <span class="logo-text">Lovixa</span>
+      </a>
+      
+      <div class="search-container">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" class="search-box" placeholder="Search for places or addresses...">
+      </div>
+      
+      <div class="user-actions">
+        <button class="icon-btn">
+          <i class="fas fa-bell"></i>
+        </button>
+        <button class="icon-btn">
+          <i class="fas fa-cog"></i>
+        </button>
+        <div class="user-avatar">A</div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="map">
+    <!-- Map will be injected here -->
+    <div class="map-overlay">
+      <div class="map-control">
+        <i class="fas fa-location-crosshairs"></i>
+        <span>My Location</span>
+      </div>
+      <div class="map-control">
+        <i class="fas fa-layer-group"></i>
+        <span>Map Style</span>
+      </div>
+    </div>
+    
+    <div class="stats-panel">
+      <div class="stats-header">
+        <div class="stats-title">Today's Activity</div>
+        <i class="fas fa-ellipsis-h"></i>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value">24.8 km</div>
+          <div class="stat-label">Distance</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">5,280</div>
+          <div class="stat-label">Steps</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">2h 18m</div>
+          <div class="stat-label">Active Time</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">7</div>
+          <div class="stat-label">Locations</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="bottom-nav-placeholder">
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <i class="fas fa-map"></i>
+        <span>Map</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-route"></i>
+        <span>Routes</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-heart"></i>
+        <span>Favorites</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-history"></i>
+        <span>History</span>
+      </div>
+      <div class="nav-item">
+        <i class="fas fa-user"></i>
+        <span>Profile</span>
+      </div>
+    </div>
+  </div>
 
   <script>
-    async function include(path, targetId) {
-      const res = await fetch(path);
-      document.getElementById(targetId).innerHTML = await res.text();
+    // Simulating the include functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Initialize the map
+      initMap();
+    });
+
+    function initMap() {
+      // This is a placeholder for Google Maps initialization
+      const mapEl = document.getElementById('map');
+      
+      // Create a simulated map
+      const mapSimulation = document.createElement('div');
+      mapSimulation.style.width = '100%';
+      mapSimulation.style.height = '100%';
+      mapSimulation.style.background = 'linear-gradient(160deg, #0a2e5a, #0d0d0d)';
+      mapSimulation.style.position = 'relative';
+      mapSimulation.style.overflow = 'hidden';
+      
+      // Add some map-like elements
+      for (let i = 0; i < 30; i++) {
+        const road = document.createElement('div');
+        road.style.position = 'absolute';
+        road.style.background = 'rgba(255, 255, 255, 0.1)';
+        road.style.borderRadius = '2px';
+        
+        if (i % 4 === 0) {
+          // Horizontal road
+          road.style.width = Math.random() * 40 + 30 + '%';
+          road.style.height = '4px';
+          road.style.top = Math.random() * 100 + '%';
+          road.style.left = Math.random() * 100 + '%';
+        } else {
+          // Vertical road
+          road.style.width = '4px';
+          road.style.height = Math.random() * 40 + 20 + '%';
+          road.style.top = Math.random() * 100 + '%';
+          road.style.left = Math.random() * 100 + '%';
+        }
+        
+        mapSimulation.appendChild(road);
+      }
+      
+      // Add some location markers
+      for (let i = 0; i < 8; i++) {
+        const marker = document.createElement('div');
+        marker.style.position = 'absolute';
+        marker.style.width = '14px';
+        marker.style.height = '14px';
+        marker.style.background = '#4CAF50';
+        marker.style.borderRadius = '50%';
+        marker.style.boxShadow = '0 0 0 4px rgba(76, 175, 80, 0.3)';
+        marker.style.top = Math.random() * 85 + 5 + '%';
+        marker.style.left = Math.random() * 85 + 5 + '%';
+        marker.style.transform = 'translate(-50%, -50%)';
+        
+        // Add pulse animation
+        marker.style.animation = 'pulse 2s infinite';
+        
+        mapSimulation.appendChild(marker);
+      }
+      
+      // Add user location marker
+      const userMarker = document.createElement('div');
+      userMarker.style.position = 'absolute';
+      userMarker.style.width = '18px';
+      userMarker.style.height = '18px';
+      userMarker.style.background = '#4285f4';
+      userMarker.style.borderRadius = '50%';
+      userMarker.style.boxShadow = '0 0 0 6px rgba(66, 133, 244, 0.3)';
+      userMarker.style.top = '65%';
+      userMarker.style.left = '48%';
+      userMarker.style.transform = 'translate(-50%, -50%)';
+      userMarker.style.animation = 'pulse 2s infinite';
+      userMarker.innerHTML = '<div style="position:absolute; top:-28px; left:50%; transform:translateX(-50%); color:white; font-size:0.8rem; font-weight:500; white-space:nowrap;">You are here</div>';
+      
+      mapSimulation.appendChild(userMarker);
+      
+      mapEl.appendChild(mapSimulation);
+      
+      // Add CSS for pulse animation
+      const style = document.createElement('style');
+      style.innerHTML = `
+        @keyframes pulse {
+          0% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0.4); }
+          70% { box-shadow: 0 0 0 12px rgba(66, 133, 244, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(66, 133, 244, 0); }
+        }
+      `;
+      document.head.appendChild(style);
     }
-    include("/components/topbar.html", "topbar-placeholder");
-    include("/components/bottom-nav.html", "bottom-nav-placeholder");
-  </script>
- <!-- Map Logic -->
-  <script type="module" src="/scripts/map.js"></script>
-  <!-- Google Maps JS API -->
-  <script async defer
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjBfn8-h0axM6dHW8IgEBRJepjS8MuVQ0&callback=initMap&libraries=places">
+    
+    // Add interactivity to navigation
+    const navItems = document.querySelectorAll('.nav-item');
+    navItems.forEach(item => {
+      item.addEventListener('click', function() {
+        navItems.forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
   </script>
 
- 
-  <script type="module" src="/scripts/search.js"></script>
 </body>
 </html>

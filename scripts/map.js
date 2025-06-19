@@ -24,7 +24,8 @@ const MAP_ID_DARK = "DEMO_DARK";
 const MAP_ID_LIGHT = "DEMO_LIGHT";
 
 // Google Maps callback
-window.initMap = () => {
+window.initMap = initMap;
+function initMap() {
   map = new google.maps.Map(document.getElementById("map"), {
     center: { lat: 41.015137, lng: 28.97953 },
     zoom: 12,

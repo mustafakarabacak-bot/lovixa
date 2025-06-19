@@ -41,7 +41,11 @@ function initMap() {
   }
 
   mapEl.style.minHeight = "calc(100vh - 120px)";
-  Object.assign(mapEl.style, { margin:"12px", borderRadius:"16px", overflow:"hidden" });
+  Object.assign(mapEl.style, {
+  margin: "0",
+  borderRadius: "0",
+  overflow: "hidden",
+});
 
   map = new google.maps.Map(mapEl, {
     center: { lat: 41.015137, lng: 28.97953 },

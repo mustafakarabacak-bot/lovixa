@@ -1,22 +1,46 @@
 <!-- /components/topbar.html -->
-<header style="height: var(--top-h); background: var(--surface); display: flex; align-items: center; padding: 0 1rem; justify-content: space-between; border-bottom: 1px solid #333;">
+<header style="
+    height: var(--top-h);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+    border-bottom: 1px solid #333;
+">
 
-  <!-- Sol: Profil fotoğrafı -->
-  <img id="topbar-profile-pic"
+  <!-- Sol: Lovixa logosu (arka plansız) -->
+  <img id="lovixa-logo"
        src="https://i.hizliresim.com/oe86t17.png"
-       alt="Profil"
-       style="height: 36px; width: 36px; border-radius: 50%; object-fit: cover;" />
+       alt="Lovixa"
+       style="height: 36px; width: auto;" />
 
   <!-- Orta: Arama kutusu -->
   <input id="map-search"
          placeholder="Haritada yer ara..."
-         style="flex: 1; margin: 0 1rem; padding: 0.5rem 1rem; border-radius: 999px; border: none; background: #2c2c2c; color: white;" />
+         style="
+           flex: 1;
+           margin: 0 1rem;
+           padding: 0.5rem 1rem;
+           border-radius: 999px;
+           border: none;
+           background: #2c2c2c;
+           color: white;
+         " />
 
-  <!-- Sağ: Mesajlar -->
+  <!-- Sağ: Mesajlar (Font Awesome paper-plane) -->
   <button id="go-to-messages"
           onclick="location.href='/messages.html'"
-          style="background: none; border: none; color: var(--text); font-size: 20px; cursor: pointer;">
-    💬
+          style="
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+          ">
+    <i class="fas fa-paper-plane"></i>
   </button>
 
 </header>

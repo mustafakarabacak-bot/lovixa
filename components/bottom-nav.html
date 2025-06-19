@@ -1,4 +1,10 @@
 <!-- /components/bottom-nav.html -->
+<!-- Font Awesome 6 ikon seti -->
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+      integrity="sha512-kuX9j/+qk3i…"
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 <nav style="
   position: fixed;
   bottom: 0;
@@ -10,40 +16,82 @@
   justify-content: space-around;
   align-items: center;
   border-top: 1px solid #333;
-  z-index: 1000;
-">
+  z-index: 1000;">
+  
+  <!-- Ana Sayfa -->
   <a href="dashboard.html" class="nav-item">
-    <span>🏠</span>
+    <i class="fas fa-house"></i>
   </a>
-  <a href="map.html" class="nav-item">
-    <span>🗺️</span>
+
+  <!-- Keşfet (eski map.html) -->
+  <a href="explore.html" class="nav-item">
+    <i class="fas fa-compass"></i>
   </a>
+
+  <!-- Orta: Paylaş (popup tetikler) -->
+  <button id="share-btn" class="share-item" title="Paylaş">
+    <i class="fas fa-plus"></i>
+  </button>
+
+  <!-- Bildirimler -->
   <a href="notifications.html" class="nav-item">
-    <span>🔔</span>
+    <i class="fas fa-bell"></i>
   </a>
+
+  <!-- Profil -->
   <a href="profile.html" class="nav-item">
-    <span>👤</span>
+    <i class="fas fa-user"></i>
   </a>
 </nav>
 
 <style>
-  .nav-item {
+  .nav-item, .share-item {
     color: var(--text);
     text-decoration: none;
     font-size: 1.4rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
-    width: 25%;
+    width: 20%;           /* beş öğeye eşit dağılım */
     transition: var(--trans);
+    background: none;
+    border: none;
+    cursor: pointer;
   }
+  .nav-item.active { color: var(--primary); }
+  .nav-item:hover,
+  .share-item:hover { opacity: .85; }
 
-  .nav-item.active {
-    color: var(--primary);
-  }
-
-  .nav-item:hover {
-    opacity: 0.8;
+  /* Orta artı ikonu daha belirgin */
+  .share-item {
+    font-size: 1.8rem;
+    transform: translateY(-8px);
   }
 </style>
+
+<!-- Paylaş popup mantığı -->
+<script>
+  document.getElementById('share-btn').onclick = () => {
+    // Basit örnek – gerçek uygulamada modal veya ayrı sayfa açılabilir
+    const modal = document.createElement('div');
+    modal.style = `
+      position:fixed; inset:0; background:rgba(0,0,0,.6);
+      display:flex; align-items:center; justify-content:center; z-index:2000`;
+    modal.innerHTML = `
+      <div style="
+        background:var(--surface); color:var(--text);
+        padding:1.5rem; border-radius:var(--radius); width:260px; text-align:center">
+        <h3>Ne paylaşmak istiyorsun?</h3>
+        <button onclick="location.href='story.html'"
+                style="margin:.5rem; ${btn()}">Hikayene Medya Ekle</button>
+        <button onclick="location.href='post.html'"
+                style="margin:.5rem; ${btn()}">Fotoğraf / Gönderi</button>
+        <button onclick="this.closest('div').parentElement.remove()"
+                style="margin-top:1rem; ${btn('#e53935')}">Kapat</button>
+      </div>`;
+    document.body.appendChild(modal);
+  };
+  function btn(bg='var(--primary)'){
+    return `padding:.6rem 1rem; border:none; border-radius:8px; background:${bg}; color:#fff; cursor:pointer`;
+  }
+</script>

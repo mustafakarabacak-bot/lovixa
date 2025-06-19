@@ -6,10 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lovixa | Dashboard</title>
 
-  <!-- Leaflet CSS (map.js bunu kullanacak) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-
-  <!-- Basit tema değişkenleri -->
   <style>
     :root {
       --bg: #0d0d0d;
@@ -34,26 +30,18 @@
       flex-direction: column;
     }
 
-    /* Harita alanı üst ve alt bar arasında tam esner */
     #map {
       flex: 1;
       width: 100%;
-      background: #000; /* Harita yüklenene kadar boş zemin */
     }
   </style>
 </head>
 <body>
 
-  <!-- Topbar yerleştirme -->
   <div id="topbar-placeholder"></div>
-
-  <!-- Ana içerik: Harita -->
   <div id="map"></div>
-
-  <!-- Bottom-nav yerleştirme -->
   <div id="bottom-nav-placeholder"></div>
 
-  <!-- Bileşenleri fetch ile içeri al -->
   <script>
     async function include(path, targetId) {
       const res = await fetch(path);
@@ -63,8 +51,13 @@
     include("/components/bottom-nav.html", "bottom-nav-placeholder");
   </script>
 
-  <!-- Modüler script’ler -->
-  <script type="module" src="/scripts/map.js"></script>
+  <!-- Google Maps JS API -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjBfn8-h0axM6dHW8IgEBRJepjS8MuVQ0&callback=initMap&libraries=places">
+  </script>
+
+  <!-- Map Logic -->
+  <script src="/scripts/map.js"></script>
   <script type="module" src="/scripts/search.js"></script>
 </body>
 </html>

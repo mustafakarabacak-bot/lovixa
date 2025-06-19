@@ -1,0 +1,63 @@
+<!-- /pages/dashboard.html -->
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lovixa | Dashboard</title>
+
+  <style>
+    :root {
+      --bg: #0d0d0d;
+      --surface: #1e1e1e;
+      --primary: #4caf50;
+      --accent: #4285f4;
+      --text: #ffffff;
+      --radius: 16px;
+      --trans: all 0.2s ease;
+      --top-h: 56px;
+      --bot-h: 56px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: "Segoe UI", sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #map {
+      flex: 1;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="topbar-placeholder"></div>
+  <div id="map"></div>
+  <div id="bottom-nav-placeholder"></div>
+
+  <script>
+    async function include(path, targetId) {
+      const res = await fetch(path);
+      document.getElementById(targetId).innerHTML = await res.text();
+    }
+    include("/components/topbar.html", "topbar-placeholder");
+    include("/components/bottom-nav.html", "bottom-nav-placeholder");
+  </script>
+
+  <!-- Google Maps JS API -->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAjBfn8-h0axM6dHW8IgEBRJepjS8MuVQ0&callback=initMap&libraries=places">
+  </script>
+
+  <!-- Map Logic -->
+  <script src="/scripts/map.js"></script>
+  <script type="module" src="/scripts/search.js"></script>
+</body>
+</html>

@@ -4,123 +4,536 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lovixa | Giriş & Kayıt</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root{
-      --bg:#0d0d0d;--surface:#1e1e1e;--primary:#4caf50;--accent:#4285f4;
-      --text:#fff;--radius:16px;--trans:.2s ease;--maxw:480px;
+    :root {
+      --bg: #0d0d0d;
+      --surface: #1e1e1e;
+      --primary: #4caf50;
+      --primary-hover: #3d8b40;
+      --accent: #4285f4;
+      --accent-hover: #3367d6;
+      --text: #fff;
+      --text-secondary: #b0b0b0;
+      --radius: 16px;
+      --radius-sm: 8px;
+      --trans: .3s ease;
+      --maxw: 480px;
+      --shadow: 0 10px 30px rgba(0,0,0,0.3);
+      --input-bg: #2a2a2a;
+      --input-border: #333;
+      --input-focus: #444;
     }
-    *{box-sizing:border-box}
-    body{
-      margin:0;min-height:100vh;display:flex;flex-direction:column;
-      align-items:center;justify-content:center;background:var(--bg);
-      color:var(--text);font-family:"Segoe UI",sans-serif;
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
-    h1{margin:0 0 1rem;font-size:1.6rem;text-align:center}
-    .card{
-      width:100%;max-width:var(--maxw);background:var(--surface);
-      padding:2rem 1.5rem;border-radius:var(--radius);
-      box-shadow:0 2px 6px rgba(0,0,0,.4);
-      display:flex;flex-direction:column;gap:1rem;
+    
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(66, 133, 244, 0.1) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(76, 175, 80, 0.1) 0%, transparent 20%);
+      color: var(--text);
+      font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      padding: 20px;
     }
-    label{display:flex;flex-direction:column;gap:.25rem;font-size:.9rem}
-    input,select{
-      padding:.7rem 1rem;border-radius:var(--radius);border:1px solid #333;
-      background:#2a2a2a;color:var(--text);font-size:.9rem;
+    
+    /* Logo Stili */
+    .logo {
+      text-align: center;
+      margin-bottom: 1.5rem;
+      position: relative;
     }
-    button{
-      padding:.8rem 1rem;border:none;border-radius:var(--radius);
-      background:var(--primary);color:#fff;font-size:1rem;cursor:pointer;
-      transition:var(--trans);
+    
+    .logo h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
     }
-    button:hover{opacity:.85}
-    .links{
-      display:flex;flex-wrap:wrap;gap:.5rem 1rem;justify-content:center;
-      font-size:.8rem;margin-top:2rem;
+    
+    .logo::after {
+      content: "";
+      display: block;
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 2px;
+      margin: 0.5rem auto 0;
     }
-    .links a{color:var(--accent);text-decoration:none}
-    .tab-row{display:flex;justify-content:center;gap:.5rem;margin-bottom:1rem}
-    .tab-row button{
-      background:transparent;border:none;color:var(--text);padding:.5rem 1rem;
-      cursor:pointer;border-bottom:2px solid transparent;transition:var(--trans);
+    
+    .logo p {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
     }
-    .tab-row button.active{border-color:var(--primary)}
-    .section{display:none}
-    .section.show{display:flex;flex-direction:column;gap:1rem}
-    .lang{position:absolute;top:.75rem;left:50%;transform:translateX(-50%);
-      font-size:.8rem}
-    .lang select{background:transparent;color:var(--text);border:none}
+    
+    /* Kart Stili */
+    .card {
+      width: 100%;
+      max-width: var(--maxw);
+      background: var(--surface);
+      padding: 2.5rem 1.5rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: var(--trans);
+    }
+    
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 5px;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+    }
+    
+    /* Sekmeler */
+    .tab-row {
+      display: flex;
+      justify-content: center;
+      gap: 0.25rem;
+      margin-bottom: 0.5rem;
+      background: #2a2a2a;
+      border-radius: var(--radius-sm);
+      padding: 4px;
+    }
+    
+    .tab-row button {
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      transition: var(--trans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      flex: 1;
+      text-align: center;
+    }
+    
+    .tab-row button:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .tab-row button.active {
+      background: var(--primary);
+      color: white;
+    }
+    
+    /* Form Elemanları */
+    .section {
+      display: none;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    
+    .section.show {
+      display: flex;
+      animation: fadeIn 0.4s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .input-group {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    
+    .input-group label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-left: 8px;
+    }
+    
+    .input-wrapper {
+      position: relative;
+    }
+    
+    .input-wrapper i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #777;
+      font-size: 1rem;
+    }
+    
+    input, select {
+      padding: 0.85rem 1rem 0.85rem 3rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
+      color: var(--text);
+      font-size: 0.95rem;
+      width: 100%;
+      transition: var(--trans);
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--input-focus);
+      box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    .checkbox-group input {
+      width: auto;
+      margin: 0;
+    }
+    
+    .checkbox-group label {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 0;
+    }
+    
+    button {
+      padding: 1rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--primary);
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--trans);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    button:hover {
+      background: var(--primary-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    }
+    
+    #google-btn {
+      background: var(--accent);
+    }
+    
+    #google-btn:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+    }
+    
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+    }
+    
+    .divider::before,
+    .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: #333;
+    }
+    
+    /* Footer Linkleri */
+    .links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      font-size: 0.8rem;
+      margin-top: 1.5rem;
+    }
+    
+    .links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: var(--trans);
+    }
+    
+    .links a:hover {
+      color: var(--accent);
+    }
+    
+    /* Dil Seçici */
+    .lang {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      font-size: 0.8rem;
+      z-index: 10;
+    }
+    
+    .lang select {
+      padding: 0.5rem 1rem 0.5rem 2.5rem;
+      background: var(--input-bg);
+      color: var(--text);
+      border: 1px solid var(--input-border);
+      border-radius: 30px;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23777' viewBox='0 0 16 16'%3E%3Cpath d='M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zM5 8a3 3 0 1 1 6 0 3 3 0 0 1-6 0z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 1rem center;
+      background-size: 16px;
+    }
+    
+    /* Responsive Düzenlemeler */
+    @media (max-width: 600px) {
+      .card {
+        padding: 2rem 1.25rem;
+      }
+      
+      .tab-row button {
+        padding: 0.65rem;
+        font-size: 0.8rem;
+      }
+      
+      .grid-2 {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .logo h1 {
+        font-size: 1.8rem;
+      }
+      
+      input, select {
+        padding: 0.8rem 1rem 0.8rem 2.8rem;
+      }
+    }
+    
+    @media (max-width: 400px) {
+      .tab-row {
+        flex-direction: column;
+        padding: 0;
+        background: transparent;
+        gap: 0.25rem;
+      }
+      
+      .tab-row button {
+        border-radius: var(--radius-sm);
+      }
+    }
+    
+    /* Ekstra Animasyonlar */
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+    }
   </style>
 </head>
 <body>
-
-  <!-- Dil seçici -->
-  <div class="lang">
-    <select id="lang">
-      <option value="tr" selected>TR</option>
-      <option value="en">EN</option>
-    </select>
-  </div>
-
   <div class="card">
-    <h1>Lovixa</h1>
+    <!-- Dil seçici -->
+    <div class="lang">
+      <select id="lang">
+        <option value="tr" selected>TR</option>
+        <option value="en">EN</option>
+        <option value="de">DE</option>
+        <option value="fr">FR</option>
+      </select>
+    </div>
+    
+    <!-- Logo ve Başlık -->
+    <div class="logo">
+      <h1>Lovixa</h1>
+      <p>Bağlantılarınızı Keşfedin</p>
+    </div>
 
     <!-- Sekmeler -->
     <div class="tab-row">
-      <button id="login-tab"    class="active">Giriş</button>
-      <button id="register-tab">Kayıt</button>
-      <button id="forgot-tab">Şifremi Unuttum</button>
+      <button id="login-tab" class="active">
+        <i class="fas fa-sign-in-alt"></i> Giriş
+      </button>
+      <button id="register-tab">
+        <i class="fas fa-user-plus"></i> Kayıt
+      </button>
+      <button id="forgot-tab">
+        <i class="fas fa-key"></i> Şifremi Unuttum
+      </button>
     </div>
 
     <!-- GİRİŞ -->
     <div id="login-section" class="section show">
-      <label>Kullanıcı Adı veya E-posta
-        <input id="login-id" type="text" required />
-      </label>
-      <label>Parola
-        <input id="login-pass" type="password" required />
-      </label>
-      <button id="login-btn">Giriş Yap</button>
-      <button id="google-btn" style="background:var(--accent)">Google ile Giriş</button>
+      <div class="input-group">
+        <label>Kullanıcı Adı veya E-posta</label>
+        <div class="input-wrapper">
+          <i class="fas fa-user"></i>
+          <input id="login-id" type="text" required placeholder="kullanici@ornek.com" />
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label>Parola</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock"></i>
+          <input id="login-pass" type="password" required placeholder="••••••••" />
+        </div>
+      </div>
+      
+      <button id="login-btn">
+        <i class="fas fa-sign-in-alt"></i> Giriş Yap
+      </button>
+      
+      <div class="divider">veya</div>
+      
+      <button id="google-btn">
+        <i class="fab fa-google"></i> Google ile Giriş
+      </button>
     </div>
 
     <!-- KAYIT -->
     <div id="register-section" class="section">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-        <label>Ad       <input id="reg-first" type="text" required /></label>
-        <label>Soyad    <input id="reg-last"  type="text" required /></label>
+      <div class="grid-2">
+        <div class="input-group">
+          <label>Ad</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input id="reg-first" type="text" required placeholder="Adınız" />
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label>Soyad</label>
+          <div class="input-wrapper">
+            <i class="fas fa-user"></i>
+            <input id="reg-last" type="text" required placeholder="Soyadınız" />
+          </div>
+        </div>
       </div>
-      <label>Kullanıcı Adı <input id="reg-username" type="text" required /></label>
-      <label>Doğum Tarihi  <input id="reg-dob" type="date" required /></label>
-      <label>E-posta       <input id="reg-email" type="email" required /></label>
-      <label>Telefon       <input id="reg-phone" type="tel" /></label>
-      <label>Cinsiyet
-        <select id="reg-gender">
-          <option value="male">Erkek</option>
-          <option value="female">Kadın</option>
-          <option value="other">Diğer</option>
-        </select>
-      </label>
-      <label>Parola         <input id="reg-pass"  type="password" required /></label>
-      <label>Parola Tekrar  <input id="reg-pass2" type="password" required /></label>
-      <label style="align-items:center;flex-direction:row;gap:.5rem">
-        <input id="show-pass" type="checkbox" /> Parolayı Göster
-      </label>
-      <button id="register-btn">Kayıt Ol</button>
+      
+      <div class="input-group">
+        <label>Kullanıcı Adı</label>
+        <div class="input-wrapper">
+          <i class="fas fa-at"></i>
+          <input id="reg-username" type="text" required placeholder="kullanici_adi" />
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label>Doğum Tarihi</label>
+        <div class="input-wrapper">
+          <i class="fas fa-calendar"></i>
+          <input id="reg-dob" type="date" required />
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label>E-posta</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope"></i>
+          <input id="reg-email" type="email" required placeholder="ornek@mail.com" />
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label>Telefon</label>
+        <div class="input-wrapper">
+          <i class="fas fa-phone"></i>
+          <input id="reg-phone" type="tel" placeholder="(5__) ___ __ __" />
+        </div>
+      </div>
+      
+      <div class="input-group">
+        <label>Cinsiyet</label>
+        <div class="input-wrapper">
+          <i class="fas fa-venus-mars"></i>
+          <select id="reg-gender">
+            <option value="male">Erkek</option>
+            <option value="female">Kadın</option>
+            <option value="other">Diğer</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="grid-2">
+        <div class="input-group">
+          <label>Parola</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input id="reg-pass" type="password" required placeholder="••••••••" />
+          </div>
+        </div>
+        
+        <div class="input-group">
+          <label>Parola Tekrar</label>
+          <div class="input-wrapper">
+            <i class="fas fa-lock"></i>
+            <input id="reg-pass2" type="password" required placeholder="••••••••" />
+          </div>
+        </div>
+      </div>
+      
+      <div class="checkbox-group">
+        <input id="show-pass" type="checkbox" />
+        <label for="show-pass">Parolayı Göster</label>
+      </div>
+      
+      <button id="register-btn">
+        <i class="fas fa-user-plus"></i> Kayıt Ol
+      </button>
     </div>
 
     <!-- ŞİFRE UNUTTUM -->
     <div id="forgot-section" class="section">
-      <label>Kayıtlı E-posta Adresi
-        <input id="forgot-email" type="email" required />
-      </label>
-      <button id="forgot-btn">Şifre Sıfırlama E-postası Gönder</button>
+      <div class="input-group">
+        <label>Kayıtlı E-posta Adresi</label>
+        <div class="input-wrapper">
+          <i class="fas fa-envelope"></i>
+          <input id="forgot-email" type="email" required placeholder="ornek@mail.com" />
+        </div>
+      </div>
+      
+      <button id="forgot-btn">
+        <i class="fas fa-paper-plane"></i> Şifre Sıfırlama E-postası Gönder
+      </button>
+      
+      <div style="margin-top: 1rem; background: rgba(66, 133, 244, 0.1); padding: 1rem; border-radius: var(--radius-sm);">
+        <p style="font-size: 0.85rem; color: var(--text-secondary);">
+          <i class="fas fa-info-circle"></i> E-postanıza şifre sıfırlama bağlantısı göndereceğiz.
+        </p>
+      </div>
     </div>
 
     <!-- Footer Links -->
     <div class="links">
-      <a href="terms.html" target="_blank">Kullanıcı Sözleşmesi</a>
-      <a href="faq.html"   target="_blank">SSS</a>
-      <a href="about.html" target="_blank">Hakkımızda</a>
+      <a href="terms.html" target="_blank"><i class="fas fa-file-contract"></i> Kullanıcı Sözleşmesi</a>
+      <a href="faq.html" target="_blank"><i class="fas fa-question-circle"></i> SSS</a>
+      <a href="about.html" target="_blank"><i class="fas fa-info-circle"></i> Hakkımızda</a>
     </div>
   </div>
 

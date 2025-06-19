@@ -1,5 +1,9 @@
-// /scripts/map.js  |  Lovixa Real-Time Google Maps Integration – FINAL
-// -------------------------------------------------
+// /scripts/map.js  |  Lovixa Real-Time Google Maps Integration – v2025-06-20
+// ===============================================================
+// ✨ Revision summary
+// 1. Siyah daire sorunu giderildi (asenkron ikon güncelleme)
+// 2. Sayfa yenilenince harita açılmama problemi çözüldü (güvenli bootstrap)
+// ---------------------------------------------------------------
 import { db, auth } from "./firebase.js";
 import {
   doc, setDoc, updateDoc, serverTimestamp,
@@ -7,20 +11,36 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
-// ---------- Küresel durum ----------
+// ---------- Global State ----------
 let map, authUser, userMarker;
-const markers   = new Map();     // uid → { marker, data }
+const markers   = new Map();        // uid → { marker, data }
 let showMyLoc   = true;
 let darkMode    = true;
-const UPDATE_MS = 5000;
-const EXPIRE_MS = 30_000;        // 30 sn
+const UPDATE_MS = 5_000;
+const EXPIRE_MS = 30_000;
 
 const MAP_ID_DARK  = "DEMO_DARK";
 const MAP_ID_LIGHT = "DEMO_LIGHT";
 
+// ----------- Bootstrap ----------
+(function bootstrap(){
+  // Google SDK yüklenmişse doğrudan başlat; değilse callback bırak.
+  if (window.google?.maps) {
+    initMap();
+  } else {
+    window.initMap = initMap;
+  }
+})();
+
 // ---------- Google callback ----------
-window.initMap = () => {
+function initMap() {
   const mapEl = document.getElementById("map");
+  if (!mapEl) {
+    console.error("#map elemanı bulunamadı – DOM sırası kontrol edin.");
+    return;
+  }
+
+  mapEl.style.minHeight = "calc(100vh - 120px)";
   Object.assign(mapEl.style, { margin:"12px", borderRadius:"16px", overflow:"hidden" });
 
   map = new google.maps.Map(mapEl, {
@@ -34,23 +54,24 @@ window.initMap = () => {
 
   renderControlIcons();
   startRealtimeFlow();
-};
+}
 
-// ---------- Firebase akışı ----------
+// ---------- Firebase flow ----------
 function startRealtimeFlow() {
   onAuthStateChanged(auth, (u) => {
     if (!u) return;
     authUser = u;
     liveLocationUpdater();
-    listenUsers();            // tüm kullanıcıları dinle
+    listenUsers();
   });
 }
 
-// 1️⃣ Konumunu 5 sn’de bir güncelle (ilk panTo sadece ilk çağrıda)
+// 1️⃣ Update own location every 5 s
 function liveLocationUpdater() {
   if (!navigator.geolocation) return;
   const selfRef = doc(db, "users", authUser.uid);
   let first = true;
+
   const push = () => {
     navigator.geolocation.getCurrentPosition(async p => {
       const { latitude:lat, longitude:lng } = p.coords;
@@ -65,21 +86,22 @@ function liveLocationUpdater() {
       first = false;
     });
   };
+
   push();
   setInterval(push, UPDATE_MS);
 }
 
-// 2️⃣ Diğer kullanıcıları dinle (lastSeen / engelle / görünürlük filtreleri)
+// 2️⃣ Listen other users in real-time
 function listenUsers() {
   onSnapshot(collection(db,"users"), snap => {
     const now = Date.now();
     snap.forEach(docSnap => {
       const uid = docSnap.id;
-      if(uid === authUser.uid) return; // kendi kaydım
-      const d   = docSnap.data();
-      // Engelle - gizle kuralları
+      if (uid === authUser.uid) return;
+
+      const d = docSnap.data();
       const blockedMe   = d.blocked?.includes(authUser.uid);
-      const iBlockedHim = docSnap.data()?.blockedBy?.includes(authUser.uid); // lazımsa
+      const iBlockedHim = d.blockedBy?.includes(authUser.uid);
       const invisible   = d.isVisible === false;
       const expired     = !d.lastSeen || now - d.lastSeen.toMillis() > EXPIRE_MS;
 
@@ -91,7 +113,7 @@ function listenUsers() {
 
       const pos = { lat:d.lat, lng:d.lng };
       if (!markers.has(uid)) {
-        markers.set(uid, makeFriendMarker(uid,d,pos, iBlockedHim));
+        markers.set(uid, makeFriendMarker(uid, d, pos, iBlockedHim));
       } else {
         markers.get(uid).marker.setPosition(pos);
       }
@@ -102,7 +124,8 @@ function listenUsers() {
 // ---------- Marker helpers ----------
 async function placeSelfMarker(position, pan) {
   if (userMarker) userMarker.setMap(null);
-  const icon = await circularImage(authUser.photoURL||"",96,"#4caf50");
+
+  const icon = await circularImage(authUser.photoURL, 96, "#4caf50");
   userMarker = new google.maps.Marker({
     position, map,
     icon:{ url:icon, scaledSize:new google.maps.Size(48,48) },
@@ -112,21 +135,28 @@ async function placeSelfMarker(position, pan) {
   if (pan) map.panTo(position);
 }
 
-function makeFriendMarker(uid,data,pos,blur){
+function makeFriendMarker(uid, data, pos, blur){
+  const placeholder = placeholderCircle(80, blur ? "#777" : "#4285f4", blur);
+
   const marker = new google.maps.Marker({
-    position:pos, map,
-    icon:{ url:circularImageSync(data.photo,80,blur?"#777":"#4285f4",blur), scaledSize:new google.maps.Size(40,40) },
-    title:data.username||"User"
+    position: pos,
+    map,
+    icon:{ url: placeholder, scaledSize: new google.maps.Size(40,40) },
+    title: data.username || "User"
   });
-  markers.set(uid,{ marker, data });
-  marker.addListener("click", ()=> openPopup(uid));
+
+  circularImage(data.photo, 80, blur ? "#777" : "#4285f4", blur)
+    .then(url => marker.setIcon({ url, scaledSize: new google.maps.Size(40,40) }))
+    .catch(console.warn);
+
+  marker.addListener("click", () => openPopup(uid));
   return { marker, data };
 }
 
 // ---------- Popup ----------
 function openPopup(uid){
   const { data } = markers.get(uid);
-  const followers = data.followers||[];
+  const followers = data.followers || [];
   const html = /*html*/`
   <div style="background:#1e1e1e;color:#fff;padding:12px;border-radius:8px;width:240px;font-family:Segoe UI">
     <div style="display:flex;align-items:center;gap:12px">
@@ -151,64 +181,96 @@ function openPopup(uid){
   new google.maps.InfoWindow({ content:html }).open(map, markers.get(uid).marker);
 }
 
-window.toggleFollow = async uid=>{
-  const ref=doc(db,"users",uid); const s=await getDoc(ref);
-  const following=s.data()?.followers?.includes(authUser.uid);
-  await updateDoc(ref,{ followers: following?arrayRemove(authUser.uid):arrayUnion(authUser.uid) });
+window.toggleFollow = async uid => {
+  const ref = doc(db,"users",uid);
+  const s   = await getDoc(ref);
+  const following = s.data()?.followers?.includes(authUser.uid);
+  await updateDoc(ref, { followers: following ? arrayRemove(authUser.uid) : arrayUnion(authUser.uid) });
 };
-window.blockUser = async uid=>{
-  await updateDoc(doc(db,"users",authUser.uid),{ blocked:arrayUnion(uid) });
+window.blockUser = async uid => {
+  await updateDoc(doc(db,"users",authUser.uid), { blocked: arrayUnion(uid) });
 };
 
-// ---------- Kontrol ikonları ----------
+// ---------- Control icons ----------
 function renderControlIcons(){
-  // Konum
-  floatingBtn("fa-location-crosshairs","left","12px",()=>{
-    showMyLoc=!showMyLoc;
-    updateDoc(doc(db,"users",authUser.uid),{ isVisible:showMyLoc });
+  floatingBtn("fa-location-crosshairs","left","12px",function(){
+    showMyLoc = !showMyLoc;
+    updateDoc(doc(db,"users",authUser.uid), { isVisible: showMyLoc });
     userMarker?.setVisible(showMyLoc);
+    this.querySelector("i").className = `fas fa-location-crosshairs${showMyLoc?'':' text-muted'}`;
   });
-  // Tema
-  floatingBtn("fa-moon","right","12px",()=>{
-    darkMode=!darkMode;
-    map.setMapId(darkMode?MAP_ID_DARK:MAP_ID_LIGHT);
-    this.className=`fas ${darkMode?'fa-moon':'fa-sun'}`;
+
+  floatingBtn(darkMode?"fa-moon":"fa-sun","right","12px",function(){
+    darkMode = !darkMode;
+    map.setMapId(darkMode ? MAP_ID_DARK : MAP_ID_LIGHT);
+    this.querySelector("i").className = `fas ${darkMode?'fa-moon':'fa-sun'}`;
   });
-}
-function floatingBtn(icon,side,x,cb){
-  const d=document.createElement("div");
-  d.innerHTML=`<i class="fas ${icon}"></i>`;
-  Object.assign(d.style,{position:"absolute",[side]:x,bottom:"88px",background:"#1e1e1e",
-    color:"#fff",width:"44px",height:"44px",borderRadius:"50%",display:"flex",
-    alignItems:"center",justifyContent:"center",cursor:"pointer",
-    boxShadow:"0 2px 6px rgba(0,0,0,.5)",zIndex:1000,fontSize:"18px"});
-  d.onclick=cb; document.body.appendChild(d);
 }
 
-// ---------- Görsel yardımcıları ----------
-function circularImageSync(src,size,border,blur){
-  const c=document.createElement("canvas");c.width=c.height=size;const x=c.getContext("2d");
-  x.fillStyle="#444";x.beginPath();x.arc(size/2,size/2,size/2,0,Math.PI*2);x.fill();
-  const img=new Image();img.crossOrigin="anonymous";img.src=src||"";
-  if(img.complete) draw(); else img.onload=draw;
-  function draw(){
-    if(blur) x.filter="blur(2px)";
-    x.save();x.beginPath();x.arc(size/2,size/2,size/2,0,Math.PI*2);x.clip();
-    x.drawImage(img,0,0,size,size);x.restore();
-    if(border){x.lineWidth=3;x.strokeStyle=border;x.beginPath();x.arc(size/2,size/2,size/2-1,0,Math.PI*2);x.stroke();}
+function floatingBtn(icon,side,x,cb){
+  const d = document.createElement("div");
+  d.innerHTML = `<i class="fas ${icon}"></i>`;
+  Object.assign(d.style,{
+    position:"absolute",[side]:x,bottom:"88px",
+    background:"#1e1e1e",color:"#fff",
+    width:"44px",height:"44px",borderRadius:"50%",
+    display:"flex",alignItems:"center",justifyContent:"center",
+    cursor:"pointer",boxShadow:"0 2px 6px rgba(0,0,0,.5)",
+    zIndex:1000,fontSize:"18px"
+  });
+  d.onclick = cb;
+  document.body.appendChild(d);
+}
+
+// ---------- Visual helpers ----------
+function placeholderCircle(size,border,blur){
+  const c = document.createElement("canvas");
+  c.width = c.height = size;
+  const x = c.getContext("2d");
+  x.fillStyle = "#444";
+  if (blur) x.filter = "blur(2px)";
+  x.beginPath(); x.arc(size/2,size/2,size/2,0,Math.PI*2); x.fill();
+  if (border){
+    x.lineWidth = 3;
+    x.strokeStyle = border;
+    x.beginPath(); x.arc(size/2,size/2,size/2-1,0,Math.PI*2);
+    x.stroke();
   }
   return c.toDataURL();
 }
-function circularImage(src,size=96,border="#fff"){
+
+/**
+ * Fotoğrafı daire içine alıp DataURL döner. Asenkron.
+ * @param {string} src   Görsel URL’i
+ * @param {number} size  Piksel genişliği
+ * @param {string} border Çerçeve rengi
+ * @param {boolean} blur  Bulanıklık efekti
+ */
+function circularImage(src,size=96,border="#fff",blur=false){
   return new Promise(res=>{
-    const c=document.createElement("canvas");c.width=c.height=size;const x=c.getContext("2d");
-    const img=new Image();img.crossOrigin="anonymous";img.src=src||"";
-    img.onload=()=>{x.save();x.beginPath();x.arc(size/2,size/2,size/2,0,Math.PI*2);x.clip();
-      x.drawImage(img,0,0,size,size);x.restore();
-      if(border){x.lineWidth=4;x.strokeStyle=border;x.beginPath();x.arc(size/2,size/2,size/2-2,0,Math.PI*2);x.stroke();}
-      res(c.toDataURL());
-    };
-    img.onerror=()=>res(c.toDataURL());
+    const c=document.createElement("canvas");
+    c.width=c.height=size;
+    const x=c.getContext("2d");
+    const img=new Image();
+    img.crossOrigin="anonymous";
+    img.src=src||"";
+    img.onload=()=>{ draw(); res(c.toDataURL()); };
+    img.onerror=()=>res(placeholderCircle(size,border,blur));
+
+    function draw(){
+      if (blur) x.filter="blur(2px)";
+      x.save(); x.beginPath();
+      x.arc(size/2,size/2,size/2,0,Math.PI*2);
+      x.clip();
+      x.drawImage(img,0,0,size,size);
+      x.restore();
+      if (border){
+        x.lineWidth=4; x.strokeStyle=border;
+        x.beginPath(); x.arc(size/2,size/2,size/2-2,0,Math.PI*2); x.stroke();
+      }
+    }
   });
 }
-const timeAgo=d=>!d?"?":`${Math.floor((Date.now()-d.getTime())/60000)} dk önce`;
+
+const timeAgo = d => !d ? "?" :
+  `${Math.floor((Date.now() - d.getTime()) / 60000)} dk önce`;

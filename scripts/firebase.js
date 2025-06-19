@@ -1,7 +1,7 @@
 // firebase.js
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"
+import { db } from '../scripts/firebase.js";
 const firebaseConfig = {
   apiKey: "AIzaSyB2CadxMwGT9Li0P5aHGorGh07ZxYqx6_o",
   authDomain: "fresh-462110.firebaseapp.com",

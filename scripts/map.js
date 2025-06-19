@@ -1,4 +1,5 @@
-// /scripts/map.js | Lovixa Real‑Time Google Maps Integration – FINAL
+// /scripts/map.js  |  Lovixa Real-Time Google Maps Integration – FINAL
+// -------------------------------------------------
 import { db, auth } from "./firebase.js";
 import {
   doc, setDoc, updateDoc, serverTimestamp,
@@ -6,25 +7,21 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
 
+// ---------- Küresel durum ----------
 let map, authUser, userMarker;
-const markers = new Map();
-let showLocation = true;
-let darkMode = true;
+const markers   = new Map();     // uid → { marker, data }
+let showMyLoc   = true;
+let darkMode    = true;
 const UPDATE_MS = 5000;
+const EXPIRE_MS = 30_000;        // 30 sn
 
-const MAP_ID_DARK = "DEMO_DARK";
+const MAP_ID_DARK  = "DEMO_DARK";
 const MAP_ID_LIGHT = "DEMO_LIGHT";
 
-// Control Elements
-let themeBtn, locationBtn;
-
-window.initMap = async () => {
+// ---------- Google callback ----------
+window.initMap = () => {
   const mapEl = document.getElementById("map");
-  Object.assign(mapEl.style, {
-    margin: "12px",
-    borderRadius: "16px",
-    overflow: "hidden"
-  });
+  Object.assign(mapEl.style, { margin:"12px", borderRadius:"16px", overflow:"hidden" });
 
   map = new google.maps.Map(mapEl, {
     center: { lat: 41.015137, lng: 28.97953 },
@@ -39,392 +36,179 @@ window.initMap = async () => {
   startRealtimeFlow();
 };
 
+// ---------- Firebase akışı ----------
 function startRealtimeFlow() {
-  onAuthStateChanged(auth, (user) => {
-    if (!user) return console.warn("Login required");
-    authUser = user;
-    
-    // Blocked users management
-    let blockedUsers = [];
-    const unsubscribeBlocked = onSnapshot(doc(db, "users", authUser.uid), (doc) => {
-      blockedUsers = doc.data()?.blocked || [];
-      markers.forEach((markerObj, uid) => {
-        if (blockedUsers.includes(uid)) {
-          markerObj.marker.setMap(null);
-          markers.delete(uid);
-        }
-      });
-    });
-
+  onAuthStateChanged(auth, (u) => {
+    if (!u) return;
+    authUser = u;
     liveLocationUpdater();
-    listenUsers(blockedUsers);
-
-    // Cleanup on logout
-    window.addEventListener('beforeunload', () => {
-      unsubscribeBlocked();
-    });
+    listenUsers();            // tüm kullanıcıları dinle
   });
 }
 
+// 1️⃣ Konumunu 5 sn’de bir güncelle (ilk panTo sadece ilk çağrıda)
 function liveLocationUpdater() {
-  if (!navigator.geolocation) return console.warn("Geolocation unsupported");
-  
-  const userRef = doc(db, "users", authUser.uid);
-  const pushLocation = async () => {
-    try {
-      const pos = await new Promise((resolve, reject) => 
-        navigator.geolocation.getCurrentPosition(resolve, reject)
-      );
-      
-      const { latitude: lat, longitude: lng } = pos.coords;
-      await setDoc(userRef, {
-        lat,
-        lng,
-        lastSeen: serverTimestamp(),
-        photo: authUser.photoURL || "",
-        username: authUser.displayName || ""
-      }, { merge: true });
-      
-      await placeUserMarker({ lat, lng });
-    } catch (error) {
-      console.error("Geolocation error:", error);
-    }
+  if (!navigator.geolocation) return;
+  const selfRef = doc(db, "users", authUser.uid);
+  let first = true;
+  const push = () => {
+    navigator.geolocation.getCurrentPosition(async p => {
+      const { latitude:lat, longitude:lng } = p.coords;
+      await setDoc(selfRef, {
+        lat, lng,
+        lastSeen : serverTimestamp(),
+        isVisible: showMyLoc,
+        photo    : authUser.photoURL || "",
+        username : authUser.displayName || ""
+      }, { merge:true });
+      await placeSelfMarker({ lat,lng }, first);
+      first = false;
+    });
   };
-  
-  pushLocation();
-  const intervalId = setInterval(pushLocation, UPDATE_MS);
-  
-  // Cleanup
-  window.addEventListener('beforeunload', () => {
-    clearInterval(intervalId);
-  });
+  push();
+  setInterval(push, UPDATE_MS);
 }
 
-function listenUsers(blockedUsers) {
-  const unsubscribe = onSnapshot(collection(db, "users"), snap => {
-    snap.docChanges().forEach(chg => {
-      const uid = chg.doc.id;
-      const data = chg.doc.data();
-      
-      // Skip self and blocked users
-      if (uid === authUser.uid || blockedUsers.includes(uid)) return;
-      
-      const pos = { lat: data.lat, lng: data.lng };
-      
-      if (chg.type === "removed") {
+// 2️⃣ Diğer kullanıcıları dinle (lastSeen / engelle / görünürlük filtreleri)
+function listenUsers() {
+  onSnapshot(collection(db,"users"), snap => {
+    const now = Date.now();
+    snap.forEach(docSnap => {
+      const uid = docSnap.id;
+      if(uid === authUser.uid) return; // kendi kaydım
+      const d   = docSnap.data();
+      // Engelle - gizle kuralları
+      const blockedMe   = d.blocked?.includes(authUser.uid);
+      const iBlockedHim = docSnap.data()?.blockedBy?.includes(authUser.uid); // lazımsa
+      const invisible   = d.isVisible === false;
+      const expired     = !d.lastSeen || now - d.lastSeen.toMillis() > EXPIRE_MS;
+
+      if (blockedMe || invisible || expired) {
         markers.get(uid)?.marker.setMap(null);
         markers.delete(uid);
-      } else if (!markers.has(uid)) {
-        markers.set(uid, createFriendMarker(uid, data, pos));
+        return;
+      }
+
+      const pos = { lat:d.lat, lng:d.lng };
+      if (!markers.has(uid)) {
+        markers.set(uid, makeFriendMarker(uid,d,pos, iBlockedHim));
       } else {
-        const markerObj = markers.get(uid);
-        markerObj.marker.setPosition(pos);
-        
-        // Update icon if photo changed
-        if (data.photo !== markerObj.photoUrl) {
-          markerObj.photoUrl = data.photo;
-          loadFriendIcon(data.photo, markerObj.marker);
-        }
+        markers.get(uid).marker.setPosition(pos);
       }
     });
   });
-  
-  // Cleanup
-  window.addEventListener('beforeunload', unsubscribe);
 }
 
-async function placeUserMarker(position) {
-  // Remove previous marker
+// ---------- Marker helpers ----------
+async function placeSelfMarker(position, pan) {
   if (userMarker) userMarker.setMap(null);
-  
-  // Create new marker
-  const iconUrl = await makeCircularImage(
-    authUser.photoURL || "https://via.placeholder.com/96/333333/FFFFFF?text=USER",
-    96,
-    "#4caf50"
-  );
-  
+  const icon = await circularImage(authUser.photoURL||"",96,"#4caf50");
   userMarker = new google.maps.Marker({
-    position,
-    map,
-    icon: {
-      url: iconUrl,
-      scaledSize: new google.maps.Size(48, 48)
-    },
-    zIndex: 999,
-    optimized: true
+    position, map,
+    icon:{ url:icon, scaledSize:new google.maps.Size(48,48) },
+    zIndex:999
   });
-  
-  userMarker.setVisible(showLocation);
-  map.panTo(position);
+  userMarker.setVisible(showMyLoc);
+  if (pan) map.panTo(position);
 }
 
-function createFriendMarker(uid, data, position) {
-  // Default icon (blue circle)
-  const defaultIcon = {
-    path: google.maps.SymbolPath.CIRCLE,
-    fillColor: "#4285f4",
-    fillOpacity: 1,
-    strokeColor: "#ffffff",
-    strokeWeight: 2,
-    scale: 20
-  };
-  
+function makeFriendMarker(uid,data,pos,blur){
   const marker = new google.maps.Marker({
-    position,
-    map,
-    icon: defaultIcon,
-    title: data.username || "User"
+    position:pos, map,
+    icon:{ url:circularImageSync(data.photo,80,blur?"#777":"#4285f4",blur), scaledSize:new google.maps.Size(40,40) },
+    title:data.username||"User"
   });
-  
-  // Store reference for updates
-  const markerObj = { marker, photoUrl: data.photo };
-  
-  // Load profile icon
-  loadFriendIcon(data.photo, marker);
-  
-  // Add click event
-  marker.addListener("click", () => openPopup(uid, data, marker));
-  
-  return markerObj;
+  markers.set(uid,{ marker, data });
+  marker.addListener("click", ()=> openPopup(uid));
+  return { marker, data };
 }
 
-function loadFriendIcon(photoUrl, marker) {
-  makeCircularImage(
-    photoUrl || "https://via.placeholder.com/96/333333/FFFFFF?text=USER",
-    80,
-    "#4285f4"
-  ).then(iconUrl => {
-    marker.setIcon({
-      url: iconUrl,
-      scaledSize: new google.maps.Size(40, 40)
-    });
-  });
-}
-
-function openPopup(uid, data, marker) {
-  const content = document.createElement("div");
-  content.style.cssText = `
-    width: 220px;
-    font-family: 'Segoe UI', sans-serif;
-    padding: 12px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
-  `;
-  
-  content.innerHTML = `
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
-      <img src="${data.photo || 'https://via.placeholder.com/96'}" 
-           style="width:48px;height:48px;border-radius:50%;object-fit:cover">
+// ---------- Popup ----------
+function openPopup(uid){
+  const { data } = markers.get(uid);
+  const followers = data.followers||[];
+  const html = /*html*/`
+  <div style="background:#1e1e1e;color:#fff;padding:12px;border-radius:8px;width:240px;font-family:Segoe UI">
+    <div style="display:flex;align-items:center;gap:12px">
+      <img src="${data.photo||''}" style="width:48px;height:48px;border-radius:50%;cursor:pointer"
+           onclick="location.href='/story.html?uid=${uid}'">
       <div>
-        <strong>${data.username || 'Kullanıcı'}</strong>
-        <div style="font-size:0.8em;color:#666">Son görülme: ${formatTime(data.lastSeen?.toDate())}</div>
+        <b>${data.username||'Kullanıcı'}</b><br>
+        <small>Takipçi: ${followers.length}</small><br>
+        <small>Son görülme: ${timeAgo(data.lastSeen?.toDate())}</small>
       </div>
-    </div>
-    <div style="display:grid;gap:8px">
-      <button class="popup-btn" data-action="message" data-uid="${uid}">
-        <i class="fas fa-comment"></i> Mesaj Gönder
-      </button>
-      <button class="popup-btn" data-action="follow" data-uid="${uid}">
-        <i class="fas ${data.followers?.includes(authUser.uid) ? 'fa-user-minus' : 'fa-user-plus'}"></i>
-        ${data.followers?.includes(authUser.uid) ? 'Takipten Çık' : 'Takip Et'}
-      </button>
-      <button class="popup-btn" data-action="profile" data-uid="${uid}">
-        <i class="fas fa-user"></i> Profili Gör
-      </button>
-      <button class="popup-btn" data-action="block" data-uid="${uid}">
-        <i class="fas fa-ban"></i> Engelle
-      </button>
-      ${data.hasStory ? `
-      <button class="popup-btn" data-action="story" data-uid="${uid}">
-        <i class="fas fa-history"></i> Hikayeyi Gör
-      </button>` : ''}
-    </div>
-  `;
-
-  const popup = new google.maps.InfoWindow({
-    content,
-    maxWidth: 300
-  });
-  
-  popup.open(map, marker);
-  
-  // Event delegation for buttons
-  content.addEventListener('click', (e) => {
-    if (!e.target.closest('.popup-btn')) return;
-    const btn = e.target.closest('.popup-btn');
-    const action = btn.dataset.action;
-    const uid = btn.dataset.uid;
-    
-    switch(action) {
-      case 'message':
-        location.href = `/messages.html?uid=${uid}`;
-        break;
-      case 'follow':
-        toggleFollow(uid);
-        popup.close();
-        break;
-      case 'profile':
-        location.href = `/profile.html?uid=${uid}`;
-        break;
-      case 'block':
-        blockUser(uid);
-        popup.close();
-        break;
-      case 'story':
-        location.href = `/story.html?uid=${uid}`;
-        break;
-    }
-  });
+    </div><hr style="border:0;border-top:1px solid #333;margin:8px 0">
+    <button class="lx" onclick="location.href='/messages.html?uid=${uid}'"><i class="fas fa-comment"></i> Mesaj</button>
+    <button class="lx" onclick="toggleFollow('${uid}')">
+      <i class="fas ${followers.includes(authUser.uid)?'fa-user-minus':'fa-user-plus'}"></i>
+      ${followers.includes(authUser.uid)?'Takipten Çık':'Takip Et'}
+    </button>
+    <button class="lx" onclick="location.href='/profile.html?uid=${uid}'"><i class="fas fa-user"></i> Profil</button>
+    <button class="lx red" onclick="blockUser('${uid}')"><i class="fas fa-ban"></i> Engelle</button>
+  </div>
+  <style>.lx{width:100%;margin:4px 0;padding:6px;border:none;border-radius:6px;background:#2a2a2a;color:#fff;cursor:pointer}
+  .lx.red{background:#c62828}</style>`;
+  new google.maps.InfoWindow({ content:html }).open(map, markers.get(uid).marker);
 }
 
-function formatTime(date) {
-  if (!date) return 'Bilinmiyor';
-  return new Intl.DateTimeFormat('tr-TR', {
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(date);
-}
-
-window.toggleFollow = async (uid) => {
-  const ref = doc(db, "users", uid);
-  const snap = await getDoc(ref);
-  const isFollowing = snap.data()?.followers?.includes(authUser.uid);
-  
-  await updateDoc(ref, {
-    followers: isFollowing ? arrayRemove(authUser.uid) : arrayUnion(authUser.uid)
-  });
+window.toggleFollow = async uid=>{
+  const ref=doc(db,"users",uid); const s=await getDoc(ref);
+  const following=s.data()?.followers?.includes(authUser.uid);
+  await updateDoc(ref,{ followers: following?arrayRemove(authUser.uid):arrayUnion(authUser.uid) });
+};
+window.blockUser = async uid=>{
+  await updateDoc(doc(db,"users",authUser.uid),{ blocked:arrayUnion(uid) });
 };
 
-window.blockUser = async (uid) => {
-  await updateDoc(doc(db, "users", authUser.uid), {
-    blocked: arrayUnion(uid)
+// ---------- Kontrol ikonları ----------
+function renderControlIcons(){
+  // Konum
+  floatingBtn("fa-location-crosshairs","left","12px",()=>{
+    showMyLoc=!showMyLoc;
+    updateDoc(doc(db,"users",authUser.uid),{ isVisible:showMyLoc });
+    userMarker?.setVisible(showMyLoc);
   });
-  
-  // Remove marker immediately
-  const markerObj = markers.get(uid);
-  if (markerObj) {
-    markerObj.marker.setMap(null);
-    markers.delete(uid);
+  // Tema
+  floatingBtn("fa-moon","right","12px",()=>{
+    darkMode=!darkMode;
+    map.setMapId(darkMode?MAP_ID_DARK:MAP_ID_LIGHT);
+    this.className=`fas ${darkMode?'fa-moon':'fa-sun'}`;
+  });
+}
+function floatingBtn(icon,side,x,cb){
+  const d=document.createElement("div");
+  d.innerHTML=`<i class="fas ${icon}"></i>`;
+  Object.assign(d.style,{position:"absolute",[side]:x,bottom:"88px",background:"#1e1e1e",
+    color:"#fff",width:"44px",height:"44px",borderRadius:"50%",display:"flex",
+    alignItems:"center",justifyContent:"center",cursor:"pointer",
+    boxShadow:"0 2px 6px rgba(0,0,0,.5)",zIndex:1000,fontSize:"18px"});
+  d.onclick=cb; document.body.appendChild(d);
+}
+
+// ---------- Görsel yardımcıları ----------
+function circularImageSync(src,size,border,blur){
+  const c=document.createElement("canvas");c.width=c.height=size;const x=c.getContext("2d");
+  x.fillStyle="#444";x.beginPath();x.arc(size/2,size/2,size/2,0,Math.PI*2);x.fill();
+  const img=new Image();img.crossOrigin="anonymous";img.src=src||"";
+  if(img.complete) draw(); else img.onload=draw;
+  function draw(){
+    if(blur) x.filter="blur(2px)";
+    x.save();x.beginPath();x.arc(size/2,size/2,size/2,0,Math.PI*2);x.clip();
+    x.drawImage(img,0,0,size,size);x.restore();
+    if(border){x.lineWidth=3;x.strokeStyle=border;x.beginPath();x.arc(size/2,size/2,size/2-1,0,Math.PI*2);x.stroke();}
   }
-};
-
-function renderControlIcons() {
-  // Location visibility toggle
-  locationBtn = floatingBtn(
-    "fa-location-crosshairs", 
-    "Konum Göster/Gizle", 
-    "left", 
-    "12px", 
-    "88px",
-    () => {
-      showLocation = !showLocation;
-      userMarker?.setVisible(showLocation);
-      locationBtn.querySelector('i').className = 
-        `fas ${showLocation ? 'fa-location-crosshairs' : 'fa-eye-slash'}`;
-    }
-  );
-
-  // Dark/Light mode toggle
-  themeBtn = floatingBtn(
-    "fa-moon", 
-    "Tema Değiştir", 
-    "right", 
-    "12px", 
-    "88px",
-    () => {
-      darkMode = !darkMode;
-      map.setMapId(darkMode ? MAP_ID_DARK : MAP_ID_LIGHT);
-      themeBtn.querySelector('i').className = 
-        `fas ${darkMode ? 'fa-moon' : 'fa-sun'}`;
-    }
-  );
+  return c.toDataURL();
 }
-
-function floatingBtn(icon, title, side, x, bottom, cb) {
-  const btn = document.createElement("div");
-  btn.innerHTML = `<i class="fas ${icon}"></i>`;
-  Object.assign(btn.style, {
-    position: "absolute",
-    [side]: x,
-    bottom: bottom,
-    background: "#1e1e1e",
-    color: "#fff",
-    width: "44px",
-    height: "44px",
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-    boxShadow: "0 2px 6px rgba(0,0,0,.5)",
-    zIndex: 1000,
-    fontSize: "18px",
-    transition: "transform 0.2s, background 0.3s"
-  });
-  
-  btn.title = title;
-  btn.addEventListener('click', cb);
-  
-  // Hover effects
-  btn.addEventListener('mouseenter', () => {
-    btn.style.transform = 'scale(1.1)';
-    btn.style.background = '#2a2a2a';
-  });
-  
-  btn.addEventListener('mouseleave', () => {
-    btn.style.transform = 'scale(1)';
-    btn.style.background = '#1e1e1e';
-  });
-  
-  document.body.appendChild(btn);
-  return btn;
-}
-
-function makeCircularImage(src, size, borderColor) {
-  return new Promise(resolve => {
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    
-    img.crossOrigin = "anonymous";
-    img.src = src;
-    
-    img.onload = () => {
-      // Draw circle
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
-      ctx.closePath();
-      ctx.clip();
-      
-      // Draw image
-      ctx.drawImage(img, 0, 0, size, size);
-      ctx.restore();
-      
-      // Add border
-      if (borderColor) {
-        ctx.lineWidth = 4;
-        ctx.strokeStyle = borderColor;
-        ctx.beginPath();
-        ctx.arc(size/2, size/2, size/2 - 2, 0, Math.PI*2);
-        ctx.stroke();
-      }
-      
-      resolve(canvas.toDataURL());
+function circularImage(src,size=96,border="#fff"){
+  return new Promise(res=>{
+    const c=document.createElement("canvas");c.width=c.height=size;const x=c.getContext("2d");
+    const img=new Image();img.crossOrigin="anonymous";img.src=src||"";
+    img.onload=()=>{x.save();x.beginPath();x.arc(size/2,size/2,size/2,0,Math.PI*2);x.clip();
+      x.drawImage(img,0,0,size,size);x.restore();
+      if(border){x.lineWidth=4;x.strokeStyle=border;x.beginPath();x.arc(size/2,size/2,size/2-2,0,Math.PI*2);x.stroke();}
+      res(c.toDataURL());
     };
-    
-    img.onerror = () => {
-      // Fallback on error
-      ctx.fillStyle = '#333';
-      ctx.beginPath();
-      ctx.arc(size/2, size/2, size/2, 0, Math.PI*2);
-      ctx.fill();
-      resolve(canvas.toDataURL());
-    };
+    img.onerror=()=>res(c.toDataURL());
   });
 }
+const timeAgo=d=>!d?"?":`${Math.floor((Date.now()-d.getTime())/60000)} dk önce`;

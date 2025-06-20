@@ -1,134 +1,205 @@
-<!DOCTYPE html>
-<html lang="tr">
+<!DOCTYPE html><html lang="tr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profil – Lovixa</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
-    .top-bar {
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      background: var(--surface);
-    }
-    .profile-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 24px 16px;
-    }
-    .profile-pic {
-      width: 96px;
-      height: 96px;
-      border-radius: 50%;
-      object-fit: cover;
-      margin-bottom: 12px;
-    }
-    .username {
-      font-size: 20px;
-      font-weight: bold;
-    }
-    .bio {
-      font-size: 14px;
-      text-align: center;
-      color: gray;
-      margin: 8px 0;
-    }
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin: 16px 0;
-    }
-    .stat {
-      text-align: center;
-    }
-    .stat span {
-      display: block;
-      font-weight: bold;
-    }
-    .actions {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .actions button {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 24px;
-      background: var(--primary);
-      color: white;
-      cursor: pointer;
-    }
-    .tabs {
-      display: flex;
-      justify-content: space-around;
-      border-top: 1px solid #333;
-      border-bottom: 1px solid #333;
-      background: var(--surface);
-    }
-    .tab {
-      padding: 12px;
-      flex: 1;
-      text-align: center;
-      cursor: pointer;
-    }
-    .tab.active {
-      border-bottom: 2px solid var(--accent);
-    }
+    :root {
+      /* Renkler proje genelindeki değişkenlerle uyumlu */
+      --bg: #0d0d0d;
+      --surface: #1e1e1e;
+      --primary: #4caf50;
+      --accent: #4285f4;
+      --text: #fff;
+      --radius: 16px;
+      --trans: all .2s ease;
+    }/* ——— Layout ——— */
+html,body{margin:0;padding:0;font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);}
+
+/* Top Bar */
+.top-bar{height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:var(--surface);border-bottom:1px solid #2a2a2a;}
+.top-left{display:flex;align-items:center;gap:4px;cursor:pointer;user-select:none;}
+.top-left .arrow{font-size:20px;line-height:1;}
+.top-left .username{font-size:17px;font-weight:600;white-space:nowrap;}
+.top-right{font-size:24px;cursor:pointer;}
+
+/* Profile Header */
+.profile-header{display:flex;flex-direction:column;align-items:center;padding:24px 16px;gap:8px;position:relative;}
+.profile-pic-wrapper{position:relative;}
+.profile-pic{width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--surface);box-shadow:0 0 0 3px var(--primary);cursor:pointer;transition:var(--trans);}  
+.name{font-size:20px;font-weight:700;}
+.bio{font-size:14px;text-align:center;color:#aaa;margin-top:4px;max-width:360px;}
+
+/* Stats */
+.stats{display:flex;justify-content:center;gap:24px;margin:16px 0;}
+.stat{text-align:center;font-size:14px;}
+.stat span{display:block;font-weight:700;font-size:17px;}
+
+/* Actions */
+.actions{display:flex;justify-content:center;gap:10px;margin-bottom:16px;}
+.actions button{padding:8px 16px;border:none;border-radius:24px;background:var(--primary);color:#fff;cursor:pointer;font-weight:600;transition:var(--trans);}    
+
+/* Tabs */
+.tabs{display:flex;justify-content:space-around;border-top:1px solid #333;border-bottom:1px solid #333;background:var(--surface);position:relative;}
+.tab{flex:1;text-align:center;padding:10px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:var(--trans);font-size:12px;}
+.tab.active{color:var(--accent);}
+.tab svg{width:20px;height:20px;}
+/* Quick‑edit FAB */
+.fab-edit{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:var(--surface);border:2px solid var(--accent);border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;}
+
+/* Pop‑ups */
+.popup{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.9);background:var(--surface);padding:16px;border-radius:var(--radius);min-width:240px;box-shadow:0 8px 20px rgba(0,0,0,.6);opacity:0;pointer-events:none;transition:var(--trans);}    
+.popup.active{opacity:1;pointer-events:all;transform:translate(-50%,-50%) scale(1);}    
+.popup button{width:100%;padding:10px 0;border:none;background:none;color:var(--text);font-size:15px;cursor:pointer;border-bottom:1px solid #333;}
+.popup button:last-child{border:none;}
+
+/* Hide util */
+.hidden{display:none !important;}
+
   </style>
 </head>
 <body>
-
-  <div class="top-bar">
-    <button onclick="history.back()">←</button>
-    <h3>Profil</h3>
-    <button onclick="location.href='settings.html'">⚙️</button>
-  </div>
-
-  <div class="profile-header">
-    <img class="profile-pic" src="https://i.hizliresim.com/oe86t17.png" alt="Profil Fotoğrafı">
-    <div class="username">@iamq4ra</div>
-    <div class="bio">Kodlar, kahveler ve kaos. #Lovixa</div>
-  </div>
-
-  <div class="stats">
-    <div class="stat">
-      <span>120</span>
-      Takipçi
+  <!-- ——— Top Navigation ——— -->
+  <header class="top-bar">
+    <div class="top-left" id="accountToggle">
+      <span class="arrow">▾</span>
+      <span class="username" id="topUsername">@username</span>
     </div>
-    <div class="stat">
-      <span>84</span>
-      Takip
+    <div class="top-right" id="settingsBtn">⋮</div>
+  </header>  <!-- ——— Profile ——— -->  <section class="profile-header">
+    <div class="profile-pic-wrapper">
+      <img id="avatar" class="profile-pic" src="https://i.hizliresim.com/oe86t17.png" alt="Profil Fotoğrafı">
     </div>
-    <div class="stat">
-      <span>14</span>
-      Hikaye
+    <div class="name" id="fullName">Full Name</div>
+    <div class="bio" id="bioText">Bio yükleniyor…</div>
+  </section>  <!-- ——— Stats ——— -->  <section class="stats">
+    <div class="stat"><span id="followersCount">0</span>Takipçi</div>
+    <div class="stat"><span id="followingCount">0</span>Takip</div>
+    <div class="stat"><span id="storiesCount">0</span>Hikaye</div>
+  </section>  <!-- ——— Actions ——— -->  <section class="actions">
+    <button id="editProfileBtn">Profili Düzenle</button>
+    <button id="addStoryBtn">Hikaye Ekle</button>
+  </section>  <!-- ——— Tab Navigation ——— -->  <nav class="tabs" id="tabsNav">
+    <div class="tab active" data-tab="posts">
+      <svg viewBox="0 0 24 24"><path d="M3 3h7v7H3V3m11 0h7v7h-7V3M3 14h7v7H3v-7m11 0h7v7h-7v-7Z"/></svg>
+      Gönderiler
     </div>
+    <div class="tab" data-tab="activity">
+      <svg viewBox="0 0 24 24"><path d="M13 2a7 7 0 0 0-7 7v7H4a2 2 0 0 0 0 4h16a2 2 0 0 0 0-4h-2V9a7 7 0 0 0-7-7Z"/></svg>
+      Etkinlikler
+    </div>
+    <div class="tab" data-tab="stories">
+      <svg viewBox="0 0 24 24"><path d="M12 2a5 5 0 0 1 5 5v9a5 5 0 0 1-5 5 5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Z"/></svg>
+      Hikayeler
+    </div>
+    <div class="fab-edit" id="quickEdit">✏️</div>
+  </nav>  <!-- ——— Pop‑ups ——— -->  <!-- Account switch / logout -->  <div class="popup" id="accountMenu">
+    <button id="switchAccountBtn">Hesap Değiştir</button>
+    <button id="logoutBtn">Çıkış Yap</button>
   </div>
-
-  <div class="actions">
-    <button onclick="location.href='edit-profile.html'">Profili Düzenle</button>
-    <button onclick="location.href='story.html'">Hikaye Ekle</button>
+  <!-- Avatar long‑press options -->
+  <div class="popup" id="avatarMenu">
+    <button id="addStoryAvatar">Hikayene Ekle</button>
+    <button id="changeAvatar">Profil Fotoğrafını Değiştir</button>
+    <button id="removeAvatar">Fotoğrafı Kaldır</button>
   </div>
+  <!-- Quick edit options -->
+  <div class="popup" id="quickEditMenu">
+    <button id="editName">İsmi Düzenle</button>
+    <button id="editBio">Biyografi Düzenle</button>
+    <button id="editLinks">Sosyal Bağlantıları Düzenle</button>
+  </div>  <!-- ——— Sekme içerikleri ——— -->  <main id="tabContent" style="min-height:40vh;padding:24px;text-align:center;color:#777;">İçerik yükleniyor…</main>  <!-- ——— Script ——— -->  <script type="module">
+    import { db, auth } from './firebase.js';
+    import { doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js';
+    import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js';
 
-  <div class="tabs">
-    <div class="tab active">Gönderiler</div>
-    <div class="tab">Etkinlikler</div>
-    <div class="tab">Hikayeler</div>
-  </div>
+    // —— DOM refs ——
+    const topUsername = document.getElementById('topUsername');
+    const accountToggle = document.getElementById('accountToggle');
+    const accountMenu  = document.getElementById('accountMenu');
+    const logoutBtn    = document.getElementById('logoutBtn');
+    const switchAccountBtn = document.getElementById('switchAccountBtn');
+    const avatar       = document.getElementById('avatar');
+    const avatarMenu   = document.getElementById('avatarMenu');
+    const fullNameEl   = document.getElementById('fullName');
+    const bioEl        = document.getElementById('bioText');
+    const followersEl  = document.getElementById('followersCount');
+    const followingEl  = document.getElementById('followingCount');
+    const storiesEl    = document.getElementById('storiesCount');
+    const settingsBtn  = document.getElementById('settingsBtn');
+    const tabsNav      = document.getElementById('tabsNav');
+    const tabContent   = document.getElementById('tabContent');
+    const quickEdit    = document.getElementById('quickEdit');
+    const quickEditMenu= document.getElementById('quickEditMenu');
 
-  <!-- Sekme içerikleri aşağıya gelecek -->
+    // —— Utils ——
+    const togglePopup = (el)=> el.classList.toggle('active');
+    document.addEventListener('click',e=>{
+      if(!accountMenu.contains(e.target) && !accountToggle.contains(e.target)) accountMenu.classList.remove('active');
+      if(!avatarMenu.contains(e.target) && !avatar.contains(e.target)) avatarMenu.classList.remove('active');
+      if(!quickEditMenu.contains(e.target) && !quickEdit.contains(e.target)) quickEditMenu.classList.remove('active');
+    });
 
-</body>
+    // —— Auth ——
+    let currentUid = null;
+    onAuthStateChanged(auth, user => {
+      if(!user){ location.href='loginregisterpage.html'; return; }
+      currentUid = user.uid;
+      listenProfile(user.uid);
+    });
+
+    // —— Real‑time profile listener ——
+    function listenProfile(uid){
+      const uRef = doc(db,'users',uid);
+      onSnapshot(uRef, snap => {
+        if(!snap.exists()) return;
+        const d = snap.data();
+        topUsername.textContent = d.username ? '@'+d.username : '@nouser';
+        fullNameEl.textContent  = d.fullName || 'Isim yok';
+        bioEl.textContent       = d.bio || '';
+        avatar.src              = d.photoURL || 'https://placehold.co/100x100/111/fff?text=+';
+        followersEl.textContent = (d.followers?.length||0);
+        followingEl.textContent = (d.following?.length||0);
+        storiesEl.textContent   = d.storiesCount || 0;
+      });
+    }
+
+    // —— Event bindings ——
+    accountToggle.addEventListener('click', ()=> togglePopup(accountMenu));
+    logoutBtn.addEventListener('click', ()=> signOut(auth));
+    switchAccountBtn.addEventListener('click', ()=> alert('Hesap değiştirme henüz implemente edilmedi.'));
+
+    settingsBtn.addEventListener('click', ()=> location.href='settings.html');
+
+    // Avatar interactions: tap = open story, long‑press = popup
+    avatar.addEventListener('click',()=> location.href='story.html');
+    let pressTimer;
+    const holdTime = 500;
+    const startHold = ()=>{ pressTimer = setTimeout(()=> togglePopup(avatarMenu), holdTime); };
+    const cancelHold= ()=> clearTimeout(pressTimer);
+    ['mousedown','touchstart'].forEach(ev=> avatar.addEventListener(ev,startHold));
+    ['mouseup','mouseleave','touchend','touchcancel'].forEach(ev=> avatar.addEventListener(ev,cancelHold));
+
+    // Quick edit
+    quickEdit.addEventListener('click', ()=> togglePopup(quickEditMenu));
+
+    // Tabs
+    tabsNav.querySelectorAll('.tab').forEach(tab=>{
+      tab.addEventListener('click', ()=> {
+        tabsNav.querySelector('.active').classList.remove('active');
+        tab.classList.add('active');
+        loadTab(tab.dataset.tab);
+      });
+    });
+
+    function loadTab(tab){
+      switch(tab){
+        case 'posts': tabContent.textContent = 'Gönderiler gelecekte buraya yüklenecek.'; break;
+        case 'activity': tabContent.textContent = 'Etkinlik akışı burada listelenecek.'; break;
+        case 'stories': tabContent.textContent = 'Hikayeler listesi yakında.'; break;
+      }
+    }
+    loadTab('posts');
+  </script></body>
 </html>

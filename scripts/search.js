@@ -1,105 +1,92 @@
-// /scripts/search.js
+/* /scripts/search.js  – Lovixa Next-Gen User Search */
 
-import { db } from './firebase.js';
+import { db } from "./firebase.js";
 import {
-  collection,
-  query,
-  where,
-  orderBy,
-  startAt,
-  endAt,
-  getDocs,
-  limit
+  collection, query, where, orderBy,
+  startAt, endAt, getDocs, limit
 } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-// 🔁 Gecikmeli tetikleme (debounce)
-function debounce(fn, delay = 300) {
-  let timer;
-  return (...args) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn(...args), delay);
-  };
-}
+/* ───────────────────────────────── Debounce */
+const debounce = (fn, delay = 300) => {
+  let t; return (...a) => { clearTimeout(t); t = setTimeout(() => fn(...a), delay); };
+};
 
-// 🔍 Firestore'da kullanıcı ara
+/* ───────────────────────────────── Firestore Lookup */
 async function searchUsers(term) {
   if (!term) return [];
 
   const usersRef = collection(db, "users");
+
+  // Varsayılan: case-insensitive => usernameLower (önerilen ek alan)
   const q = query(
     usersRef,
-    orderBy("username"),
+    orderBy("usernameLower"),
     startAt(term),
     endAt(term + "\uf8ff"),
-    limit(10)
+    limit(20)
   );
 
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
-// 🧱 UI render (listeleme)
-function renderResults(users) {
-  const container = document.getElementById("search-results");
-  container.innerHTML = "";
+/* ───────────────────────────────── UI Render */
+function renderResults(list) {
+  results.innerHTML = "";
 
-  if (!users.length) {
-    container.innerHTML = "<div style='padding: 8px; color: gray;'>Sonuç yok</div>";
+  if (!list.length) {
+    results.innerHTML = `<div class="no-res">Sonuç yok</div>`;
     return;
   }
 
-  users.forEach(user => {
-    const item = document.createElement("div");
-    item.className = "search-user-item";
-    item.innerHTML = `
-      <img src="${user.photoURL || 'https://via.placeholder.com/40'}" style="width: 32px; height: 32px; border-radius: 50%; margin-right: 10px;" />
-      <span>${user.username || user.email}</span>
+  list.forEach(u => {
+    const row = document.createElement("div");
+    row.className = "res-row";
+    row.innerHTML = `
+      <img src="${u.photoURL || 'https://via.placeholder.com/40'}" />
+      <span>${u.username || u.email}</span>
     `;
-    item.style.cssText = `
-      display: flex;
-      align-items: center;
-      padding: 8px;
-      cursor: pointer;
-      border-bottom: 1px solid #333;
-    `;
-
-    // ⬇️ Tıklanınca detay popup açılır (şu an sadece log)
-    item.onclick = () => {
-      console.log("Seçilen kullanıcı:", user);
-      alert(`Kullanıcı: ${user.username || user.email}`);
+    row.onclick = () => {
+      // TODO: Profil modal / yönlendirme
+      location.href = `/profile?id=${u.id}`;
     };
-
-    container.appendChild(item);
+    results.appendChild(row);
   });
 }
 
-// 🔗 Arama kutusuna bağlan
-const searchInput = document.getElementById("topbar-search");
-if (searchInput) {
-  const container = document.createElement("div");
-  container.id = "search-results";
-  container.style.cssText = `
-    position: absolute;
-    top: 56px;
-    left: 10px;
-    right: 10px;
-    background: #1e1e1e;
-    z-index: 999;
-    border-radius: 8px;
-    max-height: 300px;
-    overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  `;
-  document.body.appendChild(container);
+/* ───────────────────────────────── DOM Bind */
+const input   = document.getElementById("user-search");   // ID eşleşmesi düzeltildi
+const results = document.createElement("div");
+results.id = "search-results";
+results.style.cssText = `
+  position: absolute; top: var(--top-h); left: 8px; right: 8px;
+  background: #1e1e1e; border-radius: 8px; max-height: 300px;
+  overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,.3); z-index: 999;
+`;
+document.body.appendChild(results);
 
-  // Dinle ve render et
-  searchInput.addEventListener("input", debounce(async (e) => {
+/* Stil – kurumsal tutarlılık */
+const style = document.createElement("style");
+style.textContent = `
+  #search-results .res-row{display:flex;align-items:center;padding:8px 12px;
+    gap:10px;cursor:pointer;border-bottom:1px solid #333;}
+  #search-results .res-row:hover{background:#2a2a2a;}
+  #search-results img{width:32px;height:32px;border-radius:50%;}
+  #search-results .no-res{padding:8px 12px;color:gray;}
+`;
+document.head.appendChild(style);
+
+/* ───────────────────────────────── Events */
+if (input) {
+  input.addEventListener("input", debounce(async e => {
     const term = e.target.value.trim().toLowerCase();
-    if (term.length >= 2) {
-      const results = await searchUsers(term);
-      renderResults(results);
-    } else {
-      renderResults([]);
-    }
+    term.length >= 2 ? renderResults(await searchUsers(term)) : results.innerHTML = "";
   }));
+
+  /* Dış tıkta kapat */
+  document.addEventListener("click", e => {
+    if (!results.contains(e.target) && e.target !== input) results.innerHTML = "";
+  });
 }
+
+export { searchUsers };            // İleride test & yeniden kullanım için

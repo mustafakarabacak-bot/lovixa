@@ -33,7 +33,7 @@
         "destination": "/pages/chat.html"
       },
       {
-        "source": "/message",
+        "source": "/messages",
         "destination": "/pages/messages.html"
       },
       {

@@ -1,4 +1,5 @@
 <!-- /components/bottom-nav.html -->
+
 <!-- Font Awesome 6 ikon seti -->
 <link rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
@@ -12,7 +13,7 @@
   </a>
 
   <!-- Keşfet -->
-  <a href="/pages/explore.html" class="nav-item">
+  <a href="/explore" class="nav-item">
     <i class="fas fa-compass"></i>
   </a>
 
@@ -22,12 +23,12 @@
   </button>
 
   <!-- Bildirimler -->
-  <a href="/pages/notifications.html" class="nav-item">
+  <a href="/notifications" class="nav-item">
     <i class="fas fa-bell"></i>
   </a>
 
   <!-- Profil -->
-  <a href="/pages/profile.html" class="nav-item">
+  <a href="/profile" class="nav-item">
     <i class="fas fa-user"></i>
   </a>
 </nav>
@@ -45,7 +46,7 @@
     align-items: center;
     border-top: 1px solid #333;
     z-index: 1000;
-    -webkit-tap-highlight-color: transparent; /* Mavi efekt engeli */
+    -webkit-tap-highlight-color: transparent;
   }
 
   .nav-item,
@@ -61,7 +62,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    -webkit-tap-highlight-color: transparent; /* Android mavi tıklama efekti devre dışı */
+    -webkit-tap-highlight-color: transparent;
   }
 
   .nav-item.active {
@@ -77,42 +78,67 @@
     font-size: 1.8rem;
     transform: translateY(-8px);
   }
+
+  a, button {
+    -webkit-tap-highlight-color: transparent;
+  }
 </style>
 
 <script>
-  // Paylaş Butonuna Tıklanınca Popup Oluştur
+  // Stil butonu: fonksiyon önce tanımlanır
+  function btn(bg = 'var(--primary)') {
+    return `
+      padding: .6rem 1rem;
+      border: none;
+      border-radius: 8px;
+      background: ${bg};
+      color: #fff;
+      cursor: pointer;
+      font-size: .9rem;
+    `;
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     const shareBtn = document.getElementById('share-btn');
     if (!shareBtn) return;
 
     shareBtn.addEventListener('click', () => {
-      // Önceden açık modal varsa sil
       const existing = document.getElementById('popup-modal');
       if (existing) existing.remove();
 
       const modal = document.createElement('div');
       modal.id = 'popup-modal';
       modal.style = `
-        position:fixed; inset:0; background:rgba(0,0,0,.6);
-        display:flex; align-items:center; justify-content:center; z-index:2000;`;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      `;
 
       modal.innerHTML = `
         <div style="
-          background:var(--surface); color:var(--text);
-          padding:1.5rem; border-radius:var(--radius); width:260px; text-align:center; box-shadow:0 4px 12px rgba(0,0,0,0.3)">
-          <h3 style="margin-bottom:1rem;">Ne paylaşmak istiyorsun?</h3>
+          background: var(--surface);
+          color: var(--text);
+          padding: 1.5rem;
+          border-radius: var(--radius);
+          width: 260px;
+          text-align: center;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        ">
+          <h3 style="margin-bottom: 1rem;">Ne paylaşmak istiyorsun?</h3>
           <button onclick="location.href='/pages/story.html'"
-                  style="margin:.5rem; ${btn()}">Hikayene Medya Ekle</button>
+                  style="margin: .5rem; ${btn()}">Hikayene Medya Ekle</button>
           <button onclick="location.href='/pages/post.html'"
-                  style="margin:.5rem; ${btn()}">Fotoğraf / Gönderi</button>
+                  style="margin: .5rem; ${btn()}">Fotoğraf / Gönderi</button>
           <button onclick="document.getElementById('popup-modal')?.remove()"
-                  style="margin-top:1rem; ${btn('#e53935')}">Kapat</button>
-        </div>`;
+                  style="margin-top: 1rem; ${btn('#e53935')}">Kapat</button>
+        </div>
+      `;
+
       document.body.appendChild(modal);
     });
-
-    function btn(bg = 'var(--primary)') {
-      return `padding:.6rem 1rem; border:none; border-radius:8px; background:${bg}; color:#fff; cursor:pointer; font-size:.9rem`;
-    }
   });
 </script>

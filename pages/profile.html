@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profil – Lovixa</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .top-bar {
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      background: var(--surface);
+    }
+    .profile-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px 16px;
+    }
+    .profile-pic {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 12px;
+    }
+    .username {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .bio {
+      font-size: 14px;
+      text-align: center;
+      color: gray;
+      margin: 8px 0;
+    }
+    .stats {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin: 16px 0;
+    }
+    .stat {
+      text-align: center;
+    }
+    .stat span {
+      display: block;
+      font-weight: bold;
+    }
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .actions button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 24px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+    }
+    .tabs {
+      display: flex;
+      justify-content: space-around;
+      border-top: 1px solid #333;
+      border-bottom: 1px solid #333;
+      background: var(--surface);
+    }
+    .tab {
+      padding: 12px;
+      flex: 1;
+      text-align: center;
+      cursor: pointer;
+    }
+    .tab.active {
+      border-bottom: 2px solid var(--accent);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <button onclick="history.back()">←</button>
+    <h3>Profil</h3>
+    <button onclick="location.href='settings.html'">⚙️</button>
+  </div>
+
+  <div class="profile-header">
+    <img class="profile-pic" src="https://i.hizliresim.com/oe86t17.png" alt="Profil Fotoğrafı">
+    <div class="username">@iamq4ra</div>
+    <div class="bio">Kodlar, kahveler ve kaos. #Lovixa</div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <span>120</span>
+      Takipçi
+    </div>
+    <div class="stat">
+      <span>84</span>
+      Takip
+    </div>
+    <div class="stat">
+      <span>14</span>
+      Hikaye
+    </div>
+  </div>
+
+  <div class="actions">
+    <button onclick="location.href='edit-profile.html'">Profili Düzenle</button>
+    <button onclick="location.href='story.html'">Hikaye Ekle</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active">Gönderiler</div>
+    <div class="tab">Etkinlikler</div>
+    <div class="tab">Hikayeler</div>
+  </div>
+
+  <!-- Sekme içerikleri aşağıya gelecek -->
+
+</body>
+</html>

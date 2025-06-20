@@ -8,38 +8,29 @@
     ],
     "cleanUrls": true,
     "trailingSlash": false,
+
     "headers": [
       {
         "source": "**/*.@(js|css|html)",
         "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=0, must-revalidate"
-          }
+          { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
         ]
       }
     ],
+
     "rewrites": [
-      {
-        "source": "/profile",
-        "destination": "/pages/profile.html"
-      },
-      {
-        "source": "/dashboard",
-        "destination": "/dashboard.html"
-      },
-      {
-        "source": "/chat",
-        "destination": "/pages/chat.html"
-      },
-      {
-        "source": "/messages",
-        "destination": "/pages/messages.html"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+      /* ✨ KÖK SAYFALAR */
+      { "source": "/dashboard",              "destination": "/dashboard.html"          },
+      { "source": "/login",                  "destination": "/loginregisterpage.html"  },
+
+      /* ✨ PAGES DİZİNİ – tek satırla hepsi */
+      { "source": "/:page",                  "destination": "/pages/:page.html"        },
+
+      /* ✨ ALT DİZİN ÖRNEKLERİ (gerektikçe çoğalt) */
+      { "source": "/messages/:any*",         "destination": "/pages/messages/message.html" },
+
+      /* ✨ Fallback – SPA ya da bilinmeyen yol */
+      { "source": "**",                      "destination": "/index.html"              }
     ]
   }
 }

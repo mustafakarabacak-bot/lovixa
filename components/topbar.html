@@ -9,15 +9,17 @@
     border-bottom: 1px solid #333;
 ">
 
-  <!-- Sol: Lovixa logosu (arka plansız) -->
+  <!-- Sol: Logo -->
   <img id="lovixa-logo"
        src="https://i.hizliresim.com/oe86t17.png"
        alt="Lovixa"
        style="height: 36px; width: auto;" />
 
-  <!-- Orta: Arama kutusu -->
-  <input id="map-search"
-         placeholder="Haritada yer ara..."
+  <!-- Orta: Kullanıcı arama kutusu -->
+  <input id="user-search"
+         type="text"
+         placeholder="Kullanıcı ara..."
+         autocomplete="off"
          style="
            flex: 1;
            margin: 0 1rem;
@@ -28,9 +30,9 @@
            color: white;
          " />
 
-  <!-- Sağ: Mesajlar (Font Awesome paper-plane) -->
+  <!-- Sağ: Mesajlar -->
   <button id="go-to-messages"
-          onclick="location.href='/pages/messages.html'"
+          onclick="location.href='/messages'"
           style="
             background: none;
             border: none;

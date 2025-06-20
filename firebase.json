@@ -34,7 +34,7 @@
       },
       {
         "source": "/message",
-        "destination": "/pages/message.html"
+        "destination": "/pages/messages.html"
       },
       {
         "source": "**",

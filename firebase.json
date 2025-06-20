@@ -22,7 +22,7 @@
     "rewrites": [
       {
         "source": "/profile",
-        "destination": "/profile.html"
+        "destination": "/pages/profile.html"
       },
       {
         "source": "/dashboard",
@@ -30,11 +30,11 @@
       },
       {
         "source": "/chat",
-        "destination": "/chat.html"
+        "destination": "/pages/chat.html"
       },
       {
         "source": "/message",
-        "destination": "/messages/message.html"
+        "destination": "/pages/message.html"
       },
       {
         "source": "**",

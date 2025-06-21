@@ -4,1057 +4,133 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profil – Lovixa</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="stylesheet" href="../style.css" />
   <style>
-    :root {
-      --bg: #0d0d0d;
-      --surface: #1e1e1e;
-      --surface-light: #2a2a2a;
-      --primary: #4caf50;
-      --primary-dark: #3d8b40;
-      --accent: #4285f4;
-      --accent-dark: #3367d6;
-      --text: #fff;
-      --text-light: #aaa;
-      --radius: 16px;
-      --trans: all .3s ease;
-      --shadow: 0 4px 12px rgba(0,0,0,0.25);
-    }
-
-    /* ——— Layout ——— */
-    * {
-      box-sizing: border-box;
-    }
-    
-    html, body {
+    body {
       margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
       background: var(--bg);
       color: var(--text);
-      height: 100%;
     }
-
-    #app {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    /* Top Bar */
-    .top-bar {
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 16px;
-      background: var(--surface);
-      border-bottom: 1px solid #2a2a2a;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .top-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .top-left .arrow {
-      font-size: 20px;
-      line-height: 1;
-    }
-
-    .top-left .username {
-      font-size: 17px;
-      font-weight: 600;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 180px;
-    }
-
-    .top-right {
-      font-size: 24px;
-      cursor: pointer;
-      color: var(--text-light);
-      transition: var(--trans);
-    }
-
-    .top-right:hover {
-      color: var(--text);
-    }
-
-    /* Profile Header */
     .profile-header {
       display: flex;
       flex-direction: column;
       align-items: center;
       padding: 24px 16px;
-      gap: 8px;
-      position: relative;
-      background: linear-gradient(to bottom, var(--surface) 0%, var(--bg) 100%);
     }
-
-    .profile-pic-wrapper {
-      position: relative;
-    }
-
     .profile-pic {
-      width: 110px;
-      height: 110px;
+      width: 96px;
+      height: 96px;
       border-radius: 50%;
       object-fit: cover;
-      border: 3px solid var(--surface);
-      box-shadow: 0 0 0 3px var(--primary);
-      cursor: pointer;
-      transition: var(--trans);
+      margin-bottom: 12px;
     }
-
-    .profile-pic:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 0 3px var(--primary), 0 0 20px rgba(76, 175, 80, 0.5);
+    .counts {
+      display: flex;
+      justify-content: space-around;
+      margin: 12px 0;
+      width: 100%;
     }
-
-    .name {
-      font-size: 22px;
-      font-weight: 700;
-      margin-top: 8px;
-    }
-
-    .bio {
-      font-size: 15px;
+    .count {
       text-align: center;
-      color: var(--text-light);
-      margin-top: 4px;
-      max-width: 360px;
-      padding: 0 10px;
-      line-height: 1.4;
     }
-
-    /* Stats */
-    .stats {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-      margin: 16px 0;
-    }
-
-    .stat {
-      text-align: center;
-      font-size: 14px;
-      color: var(--text-light);
-    }
-
-    .stat span {
-      display: block;
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--text);
-    }
-
-    /* Actions */
-    .actions {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      padding: 0 16px;
-    }
-
-    .actions button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 24px;
-      background: var(--primary);
-      color: #fff;
-      cursor: pointer;
-      font-weight: 600;
-      transition: var(--trans);
-      box-shadow: var(--shadow);
-      flex: 1;
-      max-width: 160px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-
-    .actions button:hover {
-      background: var(--primary-dark);
-      transform: translateY(-2px);
-    }
-
-    .actions button:active {
-      transform: translateY(0);
-    }
-
-    .actions button#addStoryBtn {
-      background: var(--accent);
-    }
-
-    .actions button#addStoryBtn:hover {
-      background: var(--accent-dark);
-    }
-
-    /* Tabs */
     .tabs {
       display: flex;
       justify-content: space-around;
-      border-top: 1px solid #333;
-      border-bottom: 1px solid #333;
-      background: var(--surface);
-      position: sticky;
-      top: 56px;
-      z-index: 90;
+      border-top: 1px solid var(--surface-light);
+      border-bottom: 1px solid var(--surface-light);
+      padding: 8px 0;
     }
-
     .tab {
       flex: 1;
       text-align: center;
-      padding: 14px 0;
       cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      transition: var(--trans);
-      font-size: 13px;
-      color: var(--text-light);
-      position: relative;
     }
-
     .tab.active {
-      color: var(--accent);
+      border-bottom: 2px solid var(--primary);
+      color: var(--primary);
     }
-
-    .tab.active::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 50%;
-      height: 3px;
-      background: var(--accent);
-      border-radius: 3px 3px 0 0;
-    }
-
-    .tab svg {
-      width: 20px;
-      height: 20px;
-      fill: currentColor;
-    }
-
-    .tab:hover:not(.active) {
-      color: var(--text);
-    }
-
-    /* Quick‑edit FAB */
-    .fab-edit {
-      position: absolute;
-      right: 16px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: var(--surface);
-      border: 2px solid var(--accent);
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 16px;
-      cursor: pointer;
-      box-shadow: var(--shadow);
-      transition: var(--trans);
-    }
-
-    .fab-edit:hover {
-      background: var(--accent);
-      color: white;
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    /* Pop‑ups */
-    .popup {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(.9);
-      background: var(--surface);
-      padding: 8px 0;
-      border-radius: var(--radius);
-      min-width: 220px;
-      box-shadow: 0 8px 30px rgba(0,0,0,.7);
-      opacity: 0;
-      pointer-events: none;
-      transition: var(--trans);
-      z-index: 1000;
-    }
-
-    .popup.active {
-      opacity: 1;
-      pointer-events: all;
-      transform: translate(-50%, -50%) scale(1);
-    }
-
-    .popup button {
-      width: 100%;
-      padding: 14px 20px;
-      border: none;
-      background: none;
-      color: var(--text);
-      font-size: 15px;
-      cursor: pointer;
-      text-align: left;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      transition: var(--trans);
-    }
-
-    .popup button:hover {
-      background: rgba(255,255,255,0.05);
-    }
-
-    .popup button i {
-      width: 20px;
-      text-align: center;
-    }
-
-    .popup button:not(:last-child) {
-      border-bottom: 1px solid #333;
-    }
-
-    /* Tab Content */
-    .tab-content {
-      padding: 20px;
-      min-height: 40vh;
-      flex: 1;
-    }
-
-    .posts-grid {
+    .grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 2px;
+      margin: 8px 0;
     }
-
-    .post-item {
-      aspect-ratio: 1/1;
-      background: var(--surface-light);
-      border-radius: 4px;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .post-item img {
+    .grid img {
       width: 100%;
-      height: 100%;
+      height: 120px;
       object-fit: cover;
-      transition: var(--trans);
     }
-
-    .post-item:hover img {
-      transform: scale(1.05);
+    .modal, .popup {
+      display: none;
     }
-
-    .post-stats {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.4);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      opacity: 0;
-      transition: var(--trans);
-    }
-
-    .post-item:hover .post-stats {
-      opacity: 1;
-    }
-
-    .post-stat {
-      color: white;
-      text-align: center;
-    }
-
-    .post-stat i {
+    .modal.active, .popup.active {
       display: block;
-      font-size: 20px;
-      margin-bottom: 5px;
     }
-
-    .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-light);
-    }
-
-    .empty-state i {
-      font-size: 48px;
-      margin-bottom: 16px;
-      color: var(--accent);
-    }
-
-    .empty-state h3 {
-      margin: 0 0 8px 0;
-      color: var(--text);
-    }
-
-    /* Modal */
-    .modal {
+    #overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2000;
-      opacity: 0;
-      pointer-events: none;
-      transition: var(--trans);
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
     }
-
-    .modal.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    .modal-content {
-      background: var(--surface);
-      border-radius: var(--radius);
-      width: 90%;
-      max-width: 500px;
-      overflow: hidden;
-      transform: translateY(20px);
-      transition: var(--trans);
-    }
-
-    .modal.active .modal-content {
-      transform: translateY(0);
-    }
-
-    .modal-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #333;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-title {
-      margin: 0;
-      font-size: 18px;
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
-      color: var(--text-light);
-      font-size: 24px;
-      cursor: pointer;
-      padding: 5px;
-    }
-
-    .modal-body {
-      padding: 20px;
-    }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group label {
+    #overlay.active {
       display: block;
-      margin-bottom: 8px;
-      color: var(--text-light);
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 12px 15px;
-      background: var(--surface-light);
-      border: 1px solid #333;
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 16px;
-    }
-
-    .form-control:focus {
-      outline: none;
-      border-color: var(--accent);
-    }
-
-    .modal-footer {
-      padding: 16px 20px;
-      border-top: 1px solid #333;
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-
-    .btn {
-      padding: 10px 20px;
-      border-radius: 8px;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-      transition: var(--trans);
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: var(--accent-dark);
-    }
-
-    .btn-outline {
-      background: transparent;
-      color: var(--text-light);
-      border: 1px solid #333;
-    }
-
-    .btn-outline:hover {
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-    }
-
-    /* Overlay for popups */
-    .overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      transition: var(--trans);
-    }
-
-    .overlay.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-
-    /* Hide util */
-    .hidden {
-      display: none !important;
-    }
-
-    /* Loading spinner */
-    .spinner {
-      width: 40px;
-      height: 40px;
-      border: 4px solid rgba(255,255,255,0.1);
-      border-left-color: var(--accent);
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 20px auto;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
     }
   </style>
 </head>
 <body>
-  <div id="app">
-    <!-- ——— Top Navigation ——— -->
-    <header class="top-bar">
-      <div class="top-left" id="accountToggle">
-        <span class="arrow">▾</span>
-        <span class="username" id="topUsername">@kullaniciadi</span>
-      </div>
-      <div class="top-right" id="settingsBtn">
-        <i class="fas fa-cog"></i>
-      </div>
-    </header>
 
-    <!-- ——— Profile ——— -->
-    <section class="profile-header">
-      <div class="profile-pic-wrapper">
-        <img id="avatar" class="profile-pic" src="https://i.pravatar.cc/150?img=32" alt="Profil Fotoğrafı">
-      </div>
-      <div class="name" id="fullName">Ayşe Yılmaz</div>
-      <div class="bio" id="bioText">Fotoğrafçı | Doğa aşığı | İstanbul 🌉</div>
-    </section>
+<!-- Arka Plan Kapatıcı -->
+<div id="overlay"></div>
 
-    <!-- ——— Stats ——— -->
-    <section class="stats">
-      <div class="stat"><span id="followersCount">1.2K</span>Takipçi</div>
-      <div class="stat"><span id="followingCount">458</span>Takip</div>
-      <div class="stat"><span id="storiesCount">24</span>Hikaye</div>
-    </section>
-
-    <!-- ——— Actions ——— -->
-    <section class="actions">
-      <button id="editProfileBtn">
-        <i class="fas fa-edit"></i>Profili Düzenle
-      </button>
-      <button id="addStoryBtn">
-        <i class="fas fa-plus"></i>Hikaye Ekle
-      </button>
-    </section>
-
-    <!-- ——— Tab Navigation ——— -->
-    <nav class="tabs" id="tabsNav">
-      <div class="tab active" data-tab="posts">
-        <i class="fas fa-th-large"></i>
-        Gönderiler
-      </div>
-      <div class="tab" data-tab="activity">
-        <i class="fas fa-heart"></i>
-        Etkinlikler
-      </div>
-      <div class="tab" data-tab="stories">
-        <i class="fas fa-history"></i>
-        Hikayeler
-      </div>
-      <div class="fab-edit" id="quickEdit">
-        <i class="fas fa-pen"></i>
-      </div>
-    </nav>
-
-    <!-- ——— Tab Content ——— -->
-    <main class="tab-content" id="tabContent">
-      <div class="posts-grid" id="postsGrid">
-        <!-- Posts will be loaded here -->
-      </div>
-    </main>
-
-    <!-- ——— Pop‑ups ——— -->
-    <!-- Account switch / logout -->
-    <div class="popup" id="accountMenu">
-      <button id="switchAccountBtn">
-        <i class="fas fa-exchange-alt"></i>Hesap Değiştir
-      </button>
-      <button id="logoutBtn">
-        <i class="fas fa-sign-out-alt"></i>Çıkış Yap
-      </button>
-    </div>
-
-    <!-- Avatar long‑press options -->
-    <div class="popup" id="avatarMenu">
-      <button id="addStoryAvatar">
-        <i class="fas fa-plus-circle"></i>Hikayene Ekle
-      </button>
-      <button id="changeAvatar">
-        <i class="fas fa-camera"></i>Profil Fotoğrafını Değiştir
-      </button>
-      <button id="removeAvatar">
-        <i class="fas fa-trash"></i>Fotoğrafı Kaldır
-      </button>
-    </div>
-
-    <!-- Quick edit options -->
-    <div class="popup" id="quickEditMenu">
-      <button id="editName">
-        <i class="fas fa-signature"></i>İsmi Düzenle
-      </button>
-      <button id="editBio">
-        <i class="fas fa-file-alt"></i>Biyografi Düzenle
-      </button>
-      <button id="editLinks">
-        <i class="fas fa-link"></i>Sosyal Bağlantıları Düzenle
-      </button>
-    </div>
-
-    <!-- Overlay for popups -->
-    <div class="overlay" id="overlay"></div>
-
-    <!-- Edit Profile Modal -->
-    <div class="modal" id="editProfileModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">Profili Düzenle</h3>
-          <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="editFullName">Tam İsim</label>
-            <input type="text" class="form-control" id="editFullName" value="Ayşe Yılmaz">
-          </div>
-          <div class="form-group">
-            <label for="editUsername">Kullanıcı Adı</label>
-            <input type="text" class="form-control" id="editUsername" value="@ayseyilmaz">
-          </div>
-          <div class="form-group">
-            <label for="editBio">Biyografi</label>
-            <textarea class="form-control" id="editBio" rows="3">Fotoğrafçı | Doğa aşığı | İstanbul 🌉</textarea>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-outline" id="cancelEdit">İptal</button>
-          <button class="btn btn-primary" id="saveProfile">Kaydet</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Add Story Modal -->
-    <div class="modal" id="addStoryModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h3 class="modal-title">Hikaye Oluştur</h3>
-          <button class="modal-close">&times;</button>
-        </div>
-        <div class="modal-body">
-          <div class="form-group">
-            <label for="storyImage">Fotoğraf veya Video</label>
-            <div style="border: 2px dashed #333; border-radius: 8px; padding: 30px; text-align: center; cursor: pointer;" id="storyUploadArea">
-              <i class="fas fa-cloud-upload-alt" style="font-size: 40px; margin-bottom: 10px; color: var(--text-light);"></i>
-              <p style="margin: 0; color: var(--text-light);">Sürükle bırak veya tıklayarak seç</p>
-              <input type="file" id="storyImage" accept="image/*,video/*" style="display: none;">
-            </div>
-          </div>
-          <div class="form-group">
-            <label for="storyCaption">Başlık (isteğe bağlı)</label>
-            <input type="text" class="form-control" id="storyCaption" placeholder="Hikayen için bir başlık ekle...">
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-outline" id="cancelStory">İptal</button>
-          <button class="btn btn-primary" id="publishStory" disabled>Yayınla</button>
-        </div>
-      </div>
-    </div>
+<!-- Profil Header -->
+<div class="profile-header">
+  <img id="avatar" class="profile-pic" src="https://i.pravatar.cc/150?u=default" alt="avatar"/>
+  <h2 id="topUsername">@username</h2>
+  <p id="fullName">Ad Soyad</p>
+  <p id="bioText">Biyografi bilgisi burada yer alacak.</p>
+  <div class="counts">
+    <div class="count"><strong id="followersCount">0</strong><br>Takipçi</div>
+    <div class="count"><strong id="followingCount">0</strong><br>Takip</div>
+    <div class="count"><strong id="storiesCount">0</strong><br>Hikaye</div>
   </div>
+</div>
 
-  <script>
-    // Simüle edilmiş veri tabanı işlevleri
-    const mockDB = {
-      currentUser: {
-        id: "user123",
-        fullName: "Ayşe Yılmaz",
-        username: "@ayseyilmaz",
-        bio: "Fotoğrafçı | Doğa aşığı | İstanbul 🌉",
-        photoURL: "https://i.pravatar.cc/150?img=32",
-        followers: 1245,
-        following: 458,
-        stories: 24,
-        posts: []
-      },
-      
-      posts: [
-        { id: "post1", image: "https://picsum.photos/id/10/800/800", likes: 124, comments: 23 },
-        { id: "post2", image: "https://picsum.photos/id/11/800/800", likes: 89, comments: 12 },
-        { id: "post3", image: "https://picsum.photos/id/12/800/800", likes: 210, comments: 34 },
-        { id: "post4", image: "https://picsum.photos/id/13/800/800", likes: 156, comments: 19 },
-        { id: "post5", image: "https://picsum.photos/id/14/800/800", likes: 98, comments: 8 },
-        { id: "post6", image: "https://picsum.photos/id/15/800/800", likes: 187, comments: 25 },
-        { id: "post7", image: "https://picsum.photos/id/16/800/800", likes: 76, comments: 6 },
-        { id: "post8", image: "https://picsum.photos/id/17/800/800", likes: 142, comments: 21 },
-        { id: "post9", image: "https://picsum.photos/id/18/800/800", likes: 201, comments: 29 }
-      ],
-      
-      updateProfile: function(data) {
-        this.currentUser = {...this.currentUser, ...data};
-        return Promise.resolve();
-      },
-      
-      addStory: function(story) {
-        this.currentUser.stories++;
-        return Promise.resolve();
-      },
-      
-      getPosts: function() {
-        return Promise.resolve(this.posts);
-      }
-    };
+<!-- Sekmeler -->
+<div class="tabs" id="tabsNav">
+  <div class="tab active" data-tab="posts">Gönderiler</div>
+  <div class="tab" data-tab="activity">Etkinlikler</div>
+  <div class="tab" data-tab="stories">Hikayeler</div>
+</div>
 
-    // DOM elementleri
-    const DOM = {
-      topUsername: document.getElementById('topUsername'),
-      accountToggle: document.getElementById('accountToggle'),
-      accountMenu: document.getElementById('accountMenu'),
-      logoutBtn: document.getElementById('logoutBtn'),
-      switchAccountBtn: document.getElementById('switchAccountBtn'),
-      avatar: document.getElementById('avatar'),
-      avatarMenu: document.getElementById('avatarMenu'),
-      fullNameEl: document.getElementById('fullName'),
-      bioEl: document.getElementById('bioText'),
-      followersEl: document.getElementById('followersCount'),
-      followingEl: document.getElementById('followingCount'),
-      storiesEl: document.getElementById('storiesCount'),
-      settingsBtn: document.getElementById('settingsBtn'),
-      tabsNav: document.getElementById('tabsNav'),
-      tabContent: document.getElementById('tabContent'),
-      quickEdit: document.getElementById('quickEdit'),
-      quickEditMenu: document.getElementById('quickEditMenu'),
-      editProfileBtn: document.getElementById('editProfileBtn'),
-      addStoryBtn: document.getElementById('addStoryBtn'),
-      addStoryAvatar: document.getElementById('addStoryAvatar'),
-      changeAvatar: document.getElementById('changeAvatar'),
-      removeAvatar: document.getElementById('removeAvatar'),
-      editName: document.getElementById('editName'),
-      editBio: document.getElementById('editBio'),
-      editLinks: document.getElementById('editLinks'),
-      overlay: document.getElementById('overlay'),
-      editProfileModal: document.getElementById('editProfileModal'),
-      addStoryModal: document.getElementById('addStoryModal'),
-      postsGrid: document.getElementById('postsGrid'),
-      storyUploadArea: document.getElementById('storyUploadArea'),
-      storyImage: document.getElementById('storyImage'),
-      publishStory: document.getElementById('publishStory')
-    };
+<!-- Sekme İçerikleri -->
+<div id="tabContent">
+  <div class="grid" id="postsGrid"></div>
+</div>
 
-    // Yardımcı fonksiyonlar
-    function formatNumber(num) {
-      if (num >= 1000) {
-        return (num / 1000).toFixed(1) + 'K';
-      }
-      return num;
-    }
-
-    function togglePopup(el) {
-      el.classList.toggle('active');
-      DOM.overlay.classList.toggle('active');
-    }
-
-    function toggleModal(modal) {
-      modal.classList.toggle('active');
-      DOM.overlay.classList.toggle('active');
-    }
-
-    function loadProfileData() {
-      const user = mockDB.currentUser;
-      DOM.topUsername.textContent = user.username;
-      DOM.fullNameEl.textContent = user.fullName;
-      DOM.bioEl.textContent = user.bio;
-      DOM.avatar.src = user.photoURL;
-      DOM.followersEl.textContent = formatNumber(user.followers);
-      DOM.followingEl.textContent = formatNumber(user.following);
-      DOM.storiesEl.textContent = formatNumber(user.stories);
-    }
-
-    function loadPosts() {
-      mockDB.getPosts().then(posts => {
-        DOM.postsGrid.innerHTML = '';
-        
-        posts.forEach(post => {
-          const postElement = document.createElement('div');
-          postElement.className = 'post-item';
-          postElement.innerHTML = `
-            <img src="${post.image}" alt="Post">
-            <div class="post-stats">
-              <div class="post-stat">
-                <i class="fas fa-heart"></i>
-                ${post.likes}
-              </div>
-              <div class="post-stat">
-                <i class="fas fa-comment"></i>
-                ${post.comments}
-              </div>
-            </div>
-          `;
-          DOM.postsGrid.appendChild(postElement);
-        });
-      });
-    }
-
-    function loadTab(tab) {
-      DOM.tabContent.innerHTML = '';
-      
-      switch(tab) {
-        case 'posts':
-          DOM.tabContent.innerHTML = '<div class="posts-grid" id="postsGrid"></div>';
-          DOM.postsGrid = document.getElementById('postsGrid');
-          loadPosts();
-          break;
-          
-        case 'activity':
-          DOM.tabContent.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-heart"></i>
-              <h3>Etkinlik Bulunamadı</h3>
-              <p>Takip ettiğin kişilerin etkinlikleri burada görünecek.</p>
-            </div>
-          `;
-          break;
-          
-        case 'stories':
-          DOM.tabContent.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-history"></i>
-              <h3>Hikayen Yok</h3>
-              <p>Hikaye eklemek için yukarıdaki "Hikaye Ekle" butonunu kullan.</p>
-            </div>
-          `;
-          break;
-      }
-    }
-
-    // Event listeners
-    document.addEventListener('DOMContentLoaded', () => {
-      // Profil verilerini yükle
-      loadProfileData();
-      loadPosts();
-      
-      // Account menu
-      DOM.accountToggle.addEventListener('click', () => togglePopup(DOM.accountMenu));
-      DOM.logoutBtn.addEventListener('click', () => {
-        alert('Çıkış yapılıyor...');
-        // Gerçek uygulamada: signOut(auth).then(() => { location.href='login.html'; });
-      });
-      
-      // Avatar interactions
-      DOM.avatar.addEventListener('click', () => {
-        // Gerçek uygulamada: location.href='story.html';
-        alert('Hikaye görüntüleniyor...');
-      });
-      
-      // Long press for avatar menu
-      let pressTimer;
-      DOM.avatar.addEventListener('mousedown', () => {
-        pressTimer = setTimeout(() => togglePopup(DOM.avatarMenu), 500);
-      });
-      
-      DOM.avatar.addEventListener('mouseup', () => clearTimeout(pressTimer));
-      DOM.avatar.addEventListener('mouseleave', () => clearTimeout(pressTimer));
-      
-      // Touch events for mobile
-      DOM.avatar.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        pressTimer = setTimeout(() => togglePopup(DOM.avatarMenu), 500);
-      });
-      
-      DOM.avatar.addEventListener('touchend', () => clearTimeout(pressTimer));
-      
-      // Quick edit
-      DOM.quickEdit.addEventListener('click', () => togglePopup(DOM.quickEditMenu));
-      
-      // Edit profile button
-      DOM.editProfileBtn.addEventListener('click', () => toggleModal(DOM.editProfileModal));
-      
-      // Add story buttons
-      DOM.addStoryBtn.addEventListener('click', () => toggleModal(DOM.addStoryModal));
-      DOM.addStoryAvatar.addEventListener('click', () => toggleModal(DOM.addStoryModal));
-      
-      // Tabs
-      DOM.tabsNav.querySelectorAll('.tab').forEach(tab => {
-        tab.addEventListener('click', () => {
-          DOM.tabsNav.querySelector('.active').classList.remove('active');
-          tab.classList.add('active');
-          loadTab(tab.dataset.tab);
-        });
-      });
-      
-      // Modal close buttons
-      document.querySelectorAll('.modal-close, .btn-outline').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const modal = e.target.closest('.modal');
-          toggleModal(modal);
-        });
-      });
-      
-      // Overlay click to close modals/popups
-      DOM.overlay.addEventListener('click', () => {
-        document.querySelectorAll('.popup.active, .modal.active').forEach(el => {
-          el.classList.remove('active');
-        });
-        DOM.overlay.classList.remove('active');
-      });
-      
-      // Profile edit form submit
-      document.getElementById('saveProfile').addEventListener('click', () => {
-        const newData = {
-          fullName: document.getElementById('editFullName').value,
-          username: document.getElementById('editUsername').value,
-          bio: document.getElementById('editBio').value
-        };
-        
-        mockDB.updateProfile(newData).then(() => {
-          loadProfileData();
-          toggleModal(DOM.editProfileModal);
-        });
-      });
-      
-      // Story upload
-      DOM.storyUploadArea.addEventListener('click', () => {
-        DOM.storyImage.click();
-      });
-      
-      DOM.storyImage.addEventListener('change', (e) => {
-        if (e.target.files.length > 0) {
-          DOM.publishStory.disabled = false;
-          DOM.storyUploadArea.innerHTML = `
-            <i class="fas fa-check-circle" style="font-size: 40px; color: var(--primary); margin-bottom: 10px;"></i>
-            <p style="margin: 0;">Dosya seçildi: ${e.target.files[0].name}</p>
-          `;
-        }
-      });
-      
-      // Publish story
-      DOM.publishStory.addEventListener('click', () => {
-        const story = {
-          caption: document.getElementById('storyCaption').value,
-          file: DOM.storyImage.files[0]
-        };
-        
-        mockDB.addStory(story).then(() => {
-          loadProfileData();
-          toggleModal(DOM.addStoryModal);
-          alert('Hikaye başarıyla yayınlandı!');
-          
-          // Reset form
-          DOM.storyUploadArea.innerHTML = `
-            <i class="fas fa-cloud-upload-alt" style="font-size: 40px; margin-bottom: 10px; color: var(--text-light);"></i>
-            <p style="margin: 0; color: var(--text-light);">Sürükle bırak veya tıklayarak seç</p>
-          `;
-          document.getElementById('storyCaption').value = '';
-          DOM.storyImage.value = '';
-          DOM.publishStory.disabled = true;
-        });
-      });
-      
-      // Change avatar
-      DOM.changeAvatar.addEventListener('click', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = e => {
-          const file = e.target.files[0];
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = event => {
-              DOM.avatar.src = event.target.result;
-              // Gerçek uygulamada: uploadAvatar(file)
-              alert('Profil fotoğrafı güncellendi!');
-            };
-            reader.readAsDataURL(file);
-          }
-          togglePopup(DOM.avatarMenu);
-        };
-        input.click();
-      });
-      
-      // Remove avatar
-      DOM.removeAvatar.addEventListener('click', () => {
-        DOM.avatar.src = 'https://i.pravatar.cc/150?img=0';
-        // Gerçek uygulamada: removeAvatarFromStorage()
-        alert('Profil fotoğrafı kaldırıldı!');
-        togglePopup(DOM.avatarMenu);
-      });
+<!-- Bottom Navigation -->
+<div id="bottomNavContainer"></div>
+<script>
+  fetch("../components/bottom-nav.html")
+    .then(res => res.text())
+    .then(html => {
+      document.getElementById("bottomNavContainer").innerHTML = html;
     });
-  </script>
+</script>
+
+<!-- Tüm Modülleri Dahil Et -->
+<script type="module" src="../scripts/profile/initProfile.js"></script>
+<script type="module" src="../scripts/profile/userData.js"></script>
+<script type="module" src="../scripts/profile/postRenderer.js"></script>
+<script type="module" src="../scripts/profile/storyRenderer.js"></script>
+<script type="module" src="../scripts/profile/eventHandlers.js"></script>
+<script type="module" src="../scripts/profile/modals.js"></script>
+<script type="module" src="../scripts/profile/popups.js"></script>
+<script type="module" src="../scripts/profile/uploader.js"></script>
+<script type="module" src="../scripts/profile/profileSave.js"></script>
+<script type="module" src="../scripts/profile/tabsController.js"></script>
+
 </body>
 </html>

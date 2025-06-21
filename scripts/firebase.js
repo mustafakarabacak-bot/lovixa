@@ -1,8 +1,8 @@
-// /scripts/firebase.js
+// scripts/firebase.js
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { getAuth } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB2CadxMwGT9Li0P5aHGorGh07ZxYqx6_o",
@@ -14,10 +14,8 @@ const firebaseConfig = {
   measurementId: "G-SN6L5QJXNC"
 };
 
-// Firebase başlat
 const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-// Firestore ve Auth modüllerini dışa aktar
-export const db = getFirestore(app);
-export const auth = getAuth(app);
-export { app };
+export { app, auth, db };
